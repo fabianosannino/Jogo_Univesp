@@ -1,0 +1,94 @@
+/* Estilo apenas dos elementos novos. style.css do Pedro nao e tocado. */
+
+.aviso {
+  background: #fff8e1;
+  border-left: 6px solid #f0a500;
+  color: #3a2c00;
+  padding: 16px;
+  margin: 16px 0;
+  font-size: 1.1rem;
+  border-radius: 6px;
+}
+
+/* --- grade do professor --- */
+
+.grade { border-collapse: collapse; width: 100%; background: #fff; color: #111; }
+.grade th, .grade td { border: 1px solid #bbb; padding: 6px; text-align: center; }
+.grade th[scope="row"] { text-align: left; white-space: nowrap; }
+.grade .total { font-variant-numeric: tabular-nums; }
+
+.celula {
+  width: 44px; height: 44px;       /* alvo minimo recomendado para toque */
+  font-size: 1.3rem;
+  border: 2px solid #777;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.celula[aria-pressed="true"] { background: #1b7f4b; border-color: #10532f; color: #fff; }
+.celula:focus-visible { outline: 3px solid #0057d9; outline-offset: 2px; }
+.celula[disabled] { opacity: .5; cursor: progress; }
+
+/* --- listas de gestao --- */
+
+.lista { list-style: none; padding: 0; }
+.lista li {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; padding: 8px; border-bottom: 1px solid #ddd;
+}
+.apagar { min-height: 36px; cursor: pointer; }
+
+/* --- area do aluno --- */
+
+#area-aluno { color: #fff; padding: 24px; overflow-y: auto; max-height: 100%; }
+.convite { font-size: 1.8rem; text-align: center; }
+
+.avatares { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+.avatar-aluno {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  min-width: 120px; min-height: 120px;    /* alvo grande: mao de crianca */
+  padding: 12px;
+  font-size: 1.1rem;
+  background: #ffffff;
+  color: #111;
+  border: 3px solid #0b6b45;
+  border-radius: 16px;
+  cursor: pointer;
+}
+.avatar-aluno .emoji { font-size: 3.5rem; line-height: 1; }
+.avatar-aluno:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+
+.progresso-aluno { background: #ffffff; color: #111; padding: 20px; border-radius: 16px; }
+.progresso-aluno h2 { font-size: 1.8rem; }
+.progresso-aluno .emoji { font-size: 2.4rem; }
+.contagem { font-size: 1.3rem; }
+
+.atividades { list-style: none; padding: 0; }
+.atividade {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; margin-bottom: 8px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  background: #f4f4f4;            /* pendente: neutro, nunca vermelho */
+}
+.atividade.concluida { background: #e3f6e9; }
+.atividade .marca { font-size: 1.6rem; }
+
+/* Texto so para leitor de tela: a cor nao pode ser a unica informacao. */
+.leitor {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+.voltar { min-height: 48px; min-width: 120px; font-size: 1.1rem; cursor: pointer; }
+
+/* --- download --- */
+
+.download { margin-top: 24px; }
+.botao-baixar {
+  display: inline-block; padding: 14px 24px;
+  font-size: 1.2rem; font-weight: 600;
+  background: #0b6b45; color: #fff;
+  border-radius: 10px; text-decoration: none;
+}
+.botao-baixar:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
