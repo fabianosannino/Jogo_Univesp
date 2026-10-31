@@ -36,7 +36,11 @@ create policy atividade_da_minha_turma on atividade
     select 1 from turma t where t.id = atividade.turma_id and t.professor = auth.uid()
   ));
 
--- progresso: chega na turma passando pelo aluno
+-- progresso: o using so verifica o aluno (caminho suficiente para leitura, pois
+-- na pratica aluno e atividade pertencem a mesma turma). O with check fecha as
+-- duas pontas na escrita: garante que aluno_id E atividade_id pertencem a uma
+-- turma do professor, impedindo que o professor A grave progresso apontando para
+-- a atividade da professora B.
 create policy progresso_da_minha_turma on progresso
   for all
   using (exists (
@@ -44,8 +48,15 @@ create policy progresso_da_minha_turma on progresso
       join turma t on t.id = a.turma_id
     where a.id = progresso.aluno_id and t.professor = auth.uid()
   ))
-  with check (exists (
-    select 1 from aluno a
-      join turma t on t.id = a.turma_id
-    where a.id = progresso.aluno_id and t.professor = auth.uid()
-  ));
+  with check (
+    exists (
+      select 1 from aluno a
+        join turma t on t.id = a.turma_id
+      where a.id = progresso.aluno_id and t.professor = auth.uid()
+    )
+    and exists (
+      select 1 from atividade atv
+        join turma t2 on t2.id = atv.turma_id
+      where atv.id = progresso.atividade_id and t2.professor = auth.uid()
+    )
+  );

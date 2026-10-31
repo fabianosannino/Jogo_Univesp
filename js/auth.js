@@ -30,11 +30,17 @@ export async function sair() {
 }
 
 export async function professorAtual() {
-  const { data } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
+  // "Nao ha sessao" e "nao consegui verificar" sao coisas diferentes. Tratar os
+  // dois como ausencia de sessao expulsa um professor logado para o login quando
+  // a internet da escola oscila -- e, se oscilar de novo, em laco.
+  if (error) throw new Error(traduzir(error.message));
   return simplificar(data?.user ?? null);
 }
 
 export async function exigirProfessor() {
+  // Se professorAtual lancar, o erro passa por aqui sem redirecionar: falha de
+  // verificacao nao e falta de sessao. Quem chama trata a mensagem na tela.
   const professor = await professorAtual();
   if (!professor) {
     window.location.replace('login.html');

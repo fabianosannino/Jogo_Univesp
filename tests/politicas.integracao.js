@@ -50,21 +50,22 @@ const b = await logar(exigido('PROF_B_EMAIL'), exigido('PROF_B_SENHA'));
 const comoA = rest(a);
 const comoB = rest(b);
 
-// A cria uma turma com um aluno
-const turmaA = await comoA('turma', {
-  method: 'POST',
-  body: JSON.stringify({ nome: '__integracao_A__', professor: a.id }),
-});
-assert.ok(turmaA.ok, `A nao conseguiu criar a propria turma: ${JSON.stringify(turmaA.corpo)}`);
-const idTurmaA = turmaA.corpo[0].id;
-
-const alunoA = await comoA('aluno', {
-  method: 'POST',
-  body: JSON.stringify({ turma_id: idTurmaA, nome: 'Ana', avatar: 'coruja' }),
-});
-assert.ok(alunoA.ok, 'A nao conseguiu criar aluno na propria turma');
-
+let idTurmaA = null;
 try {
+  // A cria uma turma com um aluno
+  const turmaA = await comoA('turma', {
+    method: 'POST',
+    body: JSON.stringify({ nome: '__integracao_A__', professor: a.id }),
+  });
+  assert.ok(turmaA.ok, `A nao conseguiu criar a propria turma: ${JSON.stringify(turmaA.corpo)}`);
+  idTurmaA = turmaA.corpo[0].id;
+
+  const alunoA = await comoA('aluno', {
+    method: 'POST',
+    body: JSON.stringify({ turma_id: idTurmaA, nome: 'Ana', avatar: 'coruja' }),
+  });
+  assert.ok(alunoA.ok, 'A nao conseguiu criar aluno na propria turma');
+
   // B nao le a turma de A
   const lidas = await comoB(`turma?id=eq.${idTurmaA}`);
   assert.deepEqual(lidas.corpo, [], 'FALHA GRAVE: B leu a turma de A');
@@ -87,5 +88,6 @@ try {
 
   console.log('OK: um professor nao alcanca a turma do outro');
 } finally {
-  await comoA(`turma?id=eq.${idTurmaA}`, { method: 'DELETE' });
+  // So limpa o que chegou a existir.
+  if (idTurmaA) await comoA(`turma?id=eq.${idTurmaA}`, { method: 'DELETE' });
 }
