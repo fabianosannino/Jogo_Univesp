@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/plataforma.css">
 
     <title>Cadastro - Plataforma Educativa</title>
 </head>
@@ -21,11 +22,11 @@
             </div>
 
             <div class="input-box">   
-                <input placeholder="Senha" type="password" required>
+                <input id="senha-input" placeholder="Senha" type="password" required>
             </div>
 
             <div class="input-box">   
-                <input placeholder="Confirmar Senha" type="password" required>
+                <input id="senha-confirma-input" placeholder="Confirmar Senha" type="password" required>
             </div>
 
           <button type="submit" class="login">Login</button>
@@ -35,6 +36,6 @@
         </form>
 
     </main>
-    <script src="cadastro.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>

@@ -29,14 +29,3 @@ inputFile.addEventListener("change", function (e) {
     document.querySelector(".picture").style.backgroundImage = "url(avatar.jpg)";
   }
 });
-
-const nomeSalvo = localStorage.getItem("usuarioNome");
-const emailSalvo = localStorage.getItem("usuarioEmail");
-
-if (nomeSalvo) {
-    document.querySelector("#perfil-nome").textContent = nomeSalvo;
-}
-
-if (emailSalvo) {
-    document.querySelector("#perfil-email").textContent = emailSalvo;
-}
