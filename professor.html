@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do professor - Plataforma Educativa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/plataforma.css">
+</head>
+<body class="stars">
+    <main class="painel">
+        <header class="painel-topo">
+            <h1>Área do professor</h1>
+            <p id="identificacao"></p>
+            <button type="button" id="sair">Sair</button>
+        </header>
+
+        <p id="aviso-fila" class="aviso" hidden role="status"></p>
+
+        <section class="bloco">
+            <h2>Turmas</h2>
+            <form id="form-turma">
+                <label for="turma-nome">Nome da turma</label>
+                <input id="turma-nome" type="text" required maxlength="60">
+                <button type="submit">Criar turma</button>
+            </form>
+            <div id="lista-turmas"></div>
+
+            <label for="turma-select">Turma em uso neste computador</label>
+            <select id="turma-select"></select>
+            <button type="button" id="usar-turma">Usar esta turma aqui</button>
+            <p id="turma-ativa" class="aviso" hidden role="status"></p>
+        </section>
+
+        <section class="bloco">
+            <h2>Alunos</h2>
+            <form id="form-aluno">
+                <label for="aluno-nome">Primeiro nome</label>
+                <input id="aluno-nome" type="text" required maxlength="40">
+                <label for="avatar-input">Avatar</label>
+                <span id="caixa-avatar"></span>
+                <button type="submit">Adicionar aluno</button>
+            </form>
+            <div id="lista-alunos"></div>
+        </section>
+
+        <section class="bloco">
+            <h2>Atividades</h2>
+            <form id="form-atividade">
+                <label for="atividade-titulo">Título da atividade</label>
+                <input id="atividade-titulo" type="text" required maxlength="80">
+                <button type="submit">Adicionar atividade</button>
+            </form>
+            <div id="lista-atividades"></div>
+        </section>
+
+        <section class="bloco">
+            <h2>Marcar progresso</h2>
+            <div id="area-grade"></div>
+        </section>
+    </main>
+
+    <script type="module" src="js/professor.js"></script>
+</body>
+</html>
