@@ -107,9 +107,30 @@ git checkout main && git merge perfil-login-progresso && git push
   `<h1>O jogo vai aqui!</h1>`. Nao mexi porque e arquivo de colega; a unica alteracao
   nao-aditiva autorizada foi `lang="en"` -> `lang="pt-BR"`, por acessibilidade.
 - `perfil.html` esta orfao e mostra os textos literais "Nome" e "Email".
-- `listarTurmas()` nao filtra por `professor`: hoje a RLS e que garante o isolamento, e e
-  por isso que o item 2 importa tanto.
+- `listarTurmas()` nao filtra por `professor`: quem garante o isolamento e a RLS, e isso
+  **esta provado** desde que o teste do item 2 passou. Continua sendo defesa em uma unica
+  camada: se alguem errar uma politica no futuro, a aplicacao nao segura nada por conta
+  propria. Adicionar `.eq('professor', id)` seria cinto e suspensorio.
 - Duas abas de `professor.html` abertas na mesma maquina sobrescrevem a fila offline uma
   da outra.
 - Redesenhar `#caixa-avatar` devolve o `<select>` para um avatar ja em uso; o rotulo
   "(em uso)" avisa, mas nao impede.
+
+## 7. Duas decisoes de configuracao da autenticacao (do time, nao do codigo)
+
+Nenhuma das duas se resolve no repositorio: as duas sao chaves no painel do Supabase, em
+`Authentication` -> `Sign In / Providers` -> `Email`.
+
+**"Confirm email" esta LIGADO, e para este projeto isso so atrapalha.** Ligado, cada
+cadastro tenta enviar um e-mail, e o remetente padrao do Supabase corta em poucas
+mensagens por hora — e ai o cadastro falha com `429` mesmo estando tudo certo. E a
+plataforma nao tem **nenhum** fluxo de e-mail: nao existe tela de confirmacao, nao existe
+"esqueci minha senha". Logo a confirmacao nao protege nada e custa o cadastro. Desligada,
+nenhum e-mail e enviado, nao ha cota para estourar e a sessao vem na hora.
+`js/auth.js:22` ja trata os dois casos e nao precisa mudar.
+
+**`disable_signup` esta `false`: qualquer pessoa na internet pode criar conta de
+professor.** Nao e vazamento de dados — a RLS esta provada, cada conta so alcanca as
+proprias turmas —, mas numa escola de verdade o normal e a equipe criar as contas, nao
+haver autocadastro aberto. Como `cadastro.html` existe e e pagina do Pedro, a decisao e do
+time. Se desligarem, `js/mensagens.js` ja traduz o erro que a pagina passa a dar.

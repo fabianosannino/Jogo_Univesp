@@ -3,6 +3,7 @@
 // (spec D2, LGPD Art. 14).
 
 import { supabase } from './supabase.js';
+import { traduzirErroAuth as traduzir } from './mensagens.js';
 
 function simplificar(usuario) {
   return usuario ? { id: usuario.id, email: usuario.email } : null;
@@ -61,16 +62,6 @@ export async function exigirProfessor() {
     throw new Error('sem sessao');
   }
   return professor;
-}
-
-function traduzir(mensagem) {
-  const m = String(mensagem).toLowerCase();
-  if (m.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
-  if (m.includes('email not confirmed')) return 'Confirme o e-mail antes de entrar.';
-  if (m.includes('already registered')) return 'Este e-mail ja tem conta.';
-  if (m.includes('password should be')) return 'A senha precisa de pelo menos 6 caracteres.';
-  if (m.includes('failed to fetch')) return 'Sem conexao com a internet.';
-  return mensagem;
 }
 
 // --- fiacao das paginas do Pedro ---
