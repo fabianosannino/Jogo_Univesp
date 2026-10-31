@@ -1,9 +1,9 @@
 # O que falta para a plataforma funcionar
 
 Escrito em 2026-10-31, ao fim da branch `perfil-login-progresso`.
-Itens 1, 2 e 3 resolvidos no mesmo dia, mais a confirmacao de e-mail do item 7.
-Continuam abertos: o download do jogo (4), a mesclagem com `main` (5), o debito
-conhecido (6) e o autocadastro aberto (7).
+Itens 1, 2, 3 e 5 resolvidos no mesmo dia, mais a confirmacao de e-mail do item 7.
+Continuam abertos: o download do jogo (4), o debito conhecido (6) e o autocadastro
+aberto (7) — este ultimo porque e chave de painel, nao linha de codigo.
 
 Os 59 testes automatizados passam, e isso diz menos do que parece: eles provam que a
 logica de interface e de dados esta correta **isoladamente**. Nenhum deles toca o banco.
@@ -115,14 +115,26 @@ download: publique a build como asset de Release do GitHub (ou Drive), cole a UR
 constante, e inverta o teste "sem URL configurada, nenhuma tela do aluno mostra link de
 download" em `tests/render.test.js`. Nada mais muda.
 
-## 5. A mesclagem com `main`
+## 5. ~~A mesclagem com `main`~~ — FEITA em 2026-10-31
 
-A branch esta **23 commits a frente** de `main`, onde o Pedro trabalha, e **nada foi
-empurrado**. Mesclar e empurrar para ramo compartilhado e decisao de quem coordena a
-equipe, nao de quem implementou.
+Os 31 commits da branch entraram em `main` e foram empurrados: `c82785e..3f071e8`.
+
+Foi **fast-forward**, nao mesclagem de verdade: `main` local estava igual a `origin/main`,
+isto e, o Pedro nao tinha empurrado nada desde que a branch saiu, e `main` era ancestral
+dela. Entao nenhum commit dele foi reescrito nem perdido — o historico so andou para a
+frente. Usei `--ff-only` de proposito: se `main` tivesse andado, o comando teria falhado
+em vez de inventar um merge que ninguem revisou.
+
+Conferido antes de empurrar: nenhum arquivo de credencial rastreado (`.env.teste` e
+`.superpowers/` ficaram de fora, como o `.gitignore` manda) e os 70 testes passando ja
+dentro de `main`, nao so na branch.
+
+A branch `perfil-login-progresso` continua existindo, local e remota, apontando para o
+mesmo commit. Apagar e decisao de quem coordena.
 
 ```bash
-git checkout main && git merge perfil-login-progresso && git push
+# o que rodou
+git checkout main && git merge --ff-only perfil-login-progresso && git push origin main
 ```
 
 ## 6. Debito conhecido, deliberadamente adiado
@@ -164,5 +176,19 @@ da verificacao foi apagada; `auth.users` tem so as duas de teste e a do professo
 **`disable_signup` esta `false`: qualquer pessoa na internet pode criar conta de
 professor.** Nao e vazamento de dados — a RLS esta provada, cada conta so alcanca as
 proprias turmas —, mas numa escola de verdade o normal e a equipe criar as contas, nao
-haver autocadastro aberto. Como `cadastro.html` existe e e pagina do Pedro, a decisao e do
-time. Se desligarem, `js/mensagens.js` ja traduz o erro que a pagina passa a dar.
+haver autocadastro aberto. Se desligarem, `js/mensagens.js` ja traduz o erro que a pagina
+passa a dar ("O cadastro esta fechado. Peca para a equipe criar a sua conta.").
+
+Isto **nao da para fazer por aqui**, e vale registrar o porque para ninguem tentar de
+novo: o conector do Supabase executa SQL e migracoes, e `disable_signup` nao e uma linha
+de tabela — e configuracao do GoTrue, que so muda por
+`PATCH /v1/projects/{ref}/config/auth` da Management API, autenticada com token pessoal.
+Token pessoal e credencial, e credencial nao passa por aqui. No painel sao dois cliques:
+
+> `Authentication` -> `Sign In / Providers` -> provedor `Email` -> **"Allow new users to
+> sign up"**, desligar.
+
+Um aviso para nao se enganar depois: **esconder ou apagar `cadastro.html` nao fecha o
+autocadastro.** A pagina e so um formulario; o endereco `/auth/v1/signup` do projeto
+continua aberto a quem souber o que e a chave anon esta no `js/config.js`, visivel para
+qualquer um. Quem fecha o cadastro e a chave do painel, so ela.
