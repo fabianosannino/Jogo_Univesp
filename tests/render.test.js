@@ -144,3 +144,31 @@ test('area do aluno sempre oferece o download do jogo', () => {
     );
   }
 });
+
+test('area do aluno nao tem nenhum controle de escrita', () => {
+  const alunos = [
+    { id: 'a1', nome: 'Ana', avatar: 'coruja' },
+    { id: 'a2', nome: 'Bruno', avatar: 'tartaruga' },
+  ];
+  const atividades = [{ id: 't1', titulo: 'Contar ate 10', ordem: 1 }];
+  const g = montarGrade(alunos, atividades, [
+    { aluno_id: 'a1', atividade_id: 't1', origem: 'professor' },
+  ]);
+
+  const telas = [
+    renderAreaAluno({ estado: 'sem-turma' }),
+    renderAreaAluno({ estado: 'carregando' }),
+    renderAreaAluno({ estado: 'erro' }),
+    renderAreaAluno({ estado: 'escolher', alunos }),
+    renderAreaAluno({ estado: 'progresso', linha: montarLinhaDoAluno(g, 'a1') }),
+  ];
+
+  for (const html of telas) {
+    assert.ok(!html.includes('<input'), 'nenhum campo de entrada');
+    assert.ok(!html.includes('<textarea'), 'nenhuma area de texto');
+    assert.ok(!html.includes('<select'), 'nenhuma lista de selecao');
+    assert.ok(!html.includes('<form'), 'nenhum formulario');
+    assert.ok(!html.includes('class="celula"'), 'nenhuma celula de marcacao');
+    assert.ok(!html.includes('aria-pressed'), 'nenhum botao de alternar estado');
+  }
+});
