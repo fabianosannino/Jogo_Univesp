@@ -15,7 +15,12 @@
             <button type="button" id="sair">Sair</button>
         </header>
 
+        <!-- Duas caixas, nao uma: a de fila e um estado continuo (role=status,
+             o leitor de tela anuncia sem interromper), a de erro e um
+             acontecimento (role=alert, interrompe). Reaproveitar um <p> so
+             fazia uma mensagem apagar a outra. -->
         <p id="aviso-fila" class="aviso" hidden role="status"></p>
+        <p id="aviso-erro" class="aviso" hidden role="alert"></p>
 
         <section class="bloco">
             <h2>Turmas</h2>

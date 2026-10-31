@@ -1,7 +1,7 @@
 // Geracao de HTML. Funcoes puras: entram dados, sai string. Nao existe
 // document aqui, e e isso que torna a interface testavel sem navegador.
 
-import { acharAvatar, AVATARES } from './config.js';
+import { acharAvatar, AVATARES, URL_DOWNLOAD_JOGO } from './config.js';
 
 // Nome de aluno vem digitado pelo professor ou colado de uma lista da escola.
 // Sem escapar, um nome com < executa codigo; um nome com & quebra a tela.
@@ -172,5 +172,16 @@ export function renderAreaAluno(estado) {
       renderAvataresDaTurma(estado.alunos);
   }
 
-  return `<section id="area-aluno">${conteudo}</section>`;
+  return `<section id="area-aluno">${conteudo}${blocoDownload()}</section>`;
+}
+
+// Sem URL configurada, devolve string vazia: a tela da crianca nunca mostra um
+// link para arquivo que nao existe. Com URL, um botao grande e escapado.
+function blocoDownload() {
+  if (!URL_DOWNLOAD_JOGO) return '';
+  return (
+    `<p class="download">` +
+    `<a class="botao-baixar" href="${escaparHtml(URL_DOWNLOAD_JOGO)}">Baixar o jogo</a>` +
+    `</p>`
+  );
 }

@@ -5,6 +5,13 @@
 export const SUPABASE_URL = 'https://mdtuldswgsgewqfnggqe.supabase.co';
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kdHVsZHN3Z3NnZXdxZm5nZ3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTY0NjgsImV4cCI6MjEwODk5MjQ2OH0.6KAGjv99WSmdex_tpGCSDXz6eJwwJsH6XgMw-FKM6Ak';
 
+// Onde o jogo esta hospedado para download. VAZIA de proposito: a build tem
+// 334 MB e nao entra no git (o limite do GitHub e 100 MB por arquivo), entao
+// ela precisa de um asset de Release ou equivalente. Enquanto esta string for
+// vazia, a tela do aluno simplesmente nao mostra link nenhum — nunca um link
+// quebrado. Para ligar o download, cole a URL aqui e nada mais muda.
+export const URL_DOWNLOAD_JOGO = '';
+
 // Avatares em emoji: nenhum arquivo de imagem para carregar, funciona sem
 // rede, e cresce no tamanho que a tela precisar sem perder nitidez.
 export const AVATARES = [

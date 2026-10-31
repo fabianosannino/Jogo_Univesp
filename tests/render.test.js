@@ -7,6 +7,7 @@ import {
   renderProgressoDoAluno,
   renderAreaAluno,
 } from '../js/render.js';
+import { URL_DOWNLOAD_JOGO } from '../js/config.js';
 import { montarGrade, montarLinhaDoAluno } from '../js/grade.js';
 
 const ALUNOS = [
@@ -160,5 +161,23 @@ test('area do aluno nao tem nenhum controle de escrita', () => {
     assert.ok(!html.includes('<form'), 'nenhum formulario');
     assert.ok(!html.includes('class="celula"'), 'nenhuma celula de marcacao');
     assert.ok(!html.includes('aria-pressed'), 'nenhum botao de alternar estado');
+  }
+});
+
+// Este teste afirma o verdadeiro hoje: URL_DOWNLOAD_JOGO e vazia, logo nenhuma
+// tela mostra link de download. Quando a build dos 334 MB tiver endereco, a
+// constante recebe a URL e este teste e que deve ser invertido — nao a funcao.
+test('sem URL configurada, nenhuma tela do aluno mostra link de download', () => {
+  assert.equal(URL_DOWNLOAD_JOGO, '', 'o jogo ainda nao esta hospedado');
+
+  const telas = [
+    renderAreaAluno({ estado: 'sem-turma' }),
+    renderAreaAluno({ estado: 'carregando' }),
+    renderAreaAluno({ estado: 'erro' }),
+    renderAreaAluno({ estado: 'escolher', alunos: [{ id: 'a1', nome: 'Ana', avatar: 'coruja' }] }),
+  ];
+
+  for (const html of telas) {
+    assert.ok(!html.includes('botao-baixar'), 'nenhum link quebrado na tela da crianca');
   }
 });

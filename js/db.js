@@ -107,14 +107,20 @@ export function criarDb(cliente) {
 
     // progresso nao tem turma_id: o vinculo e via aluno. O "aluno!inner(...)"
     // pede ao Supabase a juncao, e o eq filtra pela coluna do outro lado.
-    listarProgresso(idTurma) {
-      return pegar(
+    //
+    // O map descarta a chave `aluno` que a juncao devolve. Sem ele, esta e a
+    // unica funcao daqui cujo retorno nao corresponde a sua propria lista de
+    // select, e quem mexer nela em 2027 nao tem como adivinhar que vem uma
+    // chave a mais. Uma linha resolve por construcao o que era convencao.
+    async listarProgresso(idTurma) {
+      const linhas = await pegar(
         cliente
           .from('progresso')
           .select('aluno_id, atividade_id, origem, aluno!inner(turma_id)')
           .eq('aluno.turma_id', idTurma),
         []
       );
+      return linhas.map(({ aluno, ...resto }) => resto);
     },
 
     // upsert, nao insert: a fila offline reenvia o que nao teve resposta, e

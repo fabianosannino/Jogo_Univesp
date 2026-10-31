@@ -21,8 +21,10 @@ function avisar(seletor, texto) {
   caixa.hidden = texto === '';
 }
 
+// Erro vai para a propria caixa: #aviso-fila e so da pendencia de fila, e
+// uma caixa nunca apaga a mensagem da outra.
 function erroNaTela(e) {
-  avisar('#aviso-fila', `Nao deu certo: ${e.message}`);
+  avisar('#aviso-erro', `Nao deu certo: ${e.message}`);
 }
 
 const estado = {
@@ -111,13 +113,16 @@ async function recarregarTurma() {
 
 el('#form-aluno').addEventListener('submit', async (evento) => {
   evento.preventDefault();
+  // Cada tentativa comeca limpa: a frase do erro anterior nao fica presa
+  // na tela depois de o professor corrigir o que faltava.
+  avisar('#aviso-erro', '');
   if (!estado.turmaSelecionada) {
-    avisar('#aviso-fila', 'Crie uma turma antes de cadastrar alunos.');
+    avisar('#aviso-erro', 'Crie uma turma antes de cadastrar alunos.');
     return;
   }
   const campo = el('#aluno-nome');
   if (!campo.value.trim()) {
-    avisar('#aviso-fila', 'Escreva o primeiro nome do aluno.');
+    avisar('#aviso-erro', 'Escreva o primeiro nome do aluno.');
     return;
   }
   try {
@@ -135,8 +140,11 @@ el('#form-aluno').addEventListener('submit', async (evento) => {
 
 el('#form-atividade').addEventListener('submit', async (evento) => {
   evento.preventDefault();
+  // Cada tentativa comeca limpa: a frase do erro anterior nao fica presa
+  // na tela depois de o professor corrigir o que faltava.
+  avisar('#aviso-erro', '');
   if (!estado.turmaSelecionada) {
-    avisar('#aviso-fila', 'Crie uma turma antes de cadastrar atividades.');
+    avisar('#aviso-erro', 'Crie uma turma antes de cadastrar atividades.');
     return;
   }
   const campo = el('#atividade-titulo');
@@ -188,10 +196,6 @@ el('#sair').addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
-// Sinalizador: verdadeiro quando #aviso-fila exibe uma mensagem de pendencia.
-// Evita que mostrarPendencias apague um erro exibido por erroNaTela.
-let avisoFila = false;
-
 function desenharGrade() {
   el('#area-grade').innerHTML = renderGrade(
     montarGrade(estado.alunos, estado.atividades, estado.progresso)
@@ -201,17 +205,12 @@ function desenharGrade() {
 
 function mostrarPendencias() {
   const quantas = fila.tamanho();
-  if (quantas > 0) {
-    avisar(
-      '#aviso-fila',
-      `${quantas} marcacao(oes) aguardando a internet. Nao feche esta pagina.`
-    );
-    avisoFila = true;
-  } else if (avisoFila) {
-    // So limpa se a mensagem atual e nossa; nunca apaga erro de erroNaTela.
-    avisar('#aviso-fila', '');
-    avisoFila = false;
-  }
+  avisar(
+    '#aviso-fila',
+    quantas > 0
+      ? `${quantas} marcacao(oes) aguardando a internet. Nao feche esta pagina.`
+      : ''
+  );
 }
 
 // Altera o estado local antes de falar com o banco: a tela responde na hora,

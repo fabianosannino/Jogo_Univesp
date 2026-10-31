@@ -100,6 +100,16 @@ test('listarProgresso filtra pela turma do aluno', async () => {
   assert.ok(cliente.chamadas.some(([m, c, v]) => m === 'eq' && c === 'aluno.turma_id' && v === 't1'));
 });
 
+test('listarProgresso nao deixa a chave da juncao escapar', async () => {
+  const cliente = clienteFalso({
+    data: [{ aluno_id: 'a1', atividade_id: 't1', origem: 'professor', aluno: { turma_id: 'x' } }],
+    error: null,
+  });
+  const linhas = await criarDb(cliente).listarProgresso('x');
+
+  assert.deepEqual(linhas, [{ aluno_id: 'a1', atividade_id: 't1', origem: 'professor' }]);
+});
+
 test('erro do banco virar excecao com mensagem legivel', async () => {
   const cliente = clienteFalso({ data: null, error: { message: 'permission denied' } });
   await assert.rejects(
