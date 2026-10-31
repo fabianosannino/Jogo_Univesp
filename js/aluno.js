@@ -59,7 +59,7 @@ raiz.addEventListener('click', (evento) => {
   // Voltar recarrega do banco: se o professor marcou algo enquanto esta tela
   // estava aberta, o aluno ve o novo estado ao entrar de novo.
   if (evento.target.closest('.voltar')) {
-    carregar();
+    carregar().catch((e) => console.error('[aluno] voltar:', e));
   }
 });
 

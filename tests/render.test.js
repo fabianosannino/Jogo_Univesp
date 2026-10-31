@@ -135,16 +135,6 @@ test('area do aluno com turma sem alunos explica a situacao', () => {
   assert.match(html, /professor/i);
 });
 
-test('area do aluno sempre oferece o download do jogo', () => {
-  for (const estado of ['sem-turma', 'carregando', 'escolher']) {
-    assert.match(
-      renderAreaAluno({ estado, alunos: ALUNOS }),
-      /baixar/i,
-      `falta o download no estado ${estado}`
-    );
-  }
-});
-
 test('area do aluno nao tem nenhum controle de escrita', () => {
   const alunos = [
     { id: 'a1', nome: 'Ana', avatar: 'coruja' },

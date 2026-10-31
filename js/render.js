@@ -153,13 +153,6 @@ export function renderProgressoDoAluno(linha) {
   );
 }
 
-const BLOCO_DOWNLOAD =
-  `<section class="download">` +
-  `<h2>Jogo educativo</h2>` +
-  `<p>O jogo roda no computador, fora do navegador.</p>` +
-  `<a class="botao-baixar" href="jogo/JogosEducativos.zip" download>Baixar o jogo</a>` +
-  `</section>`;
-
 export function renderAreaAluno(estado) {
   let conteudo;
 
@@ -179,5 +172,5 @@ export function renderAreaAluno(estado) {
       renderAvataresDaTurma(estado.alunos);
   }
 
-  return `<section id="area-aluno">${conteudo}${BLOCO_DOWNLOAD}</section>`;
+  return `<section id="area-aluno">${conteudo}</section>`;
 }
