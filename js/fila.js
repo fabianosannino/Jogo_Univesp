@@ -38,6 +38,22 @@ function aplicarItem(lista, item) {
   return lista;
 }
 
+// O proprio acesso a window.localStorage pode lancar (Firefox com
+// resistFingerprinting, cookie bloqueado). Recebe uma FUNCAO em vez do objeto
+// porque e o acesso que lanca -- e isso torna a funcao testavel no Node, que
+// nao tem window.
+export function armazenamentoSeguro(obter) {
+  try {
+    const bruto = obter();
+    if (bruto) return bruto;
+  } catch {
+    // navegador bloqueou o armazenamento
+  }
+  // Substituto inerte: a fila segue funcionando em memoria, so nao sobrevive
+  // ao recarregar a pagina.
+  return { getItem: () => null, setItem: () => {} };
+}
+
 export function criarFila(armazenamento, chave = 'fila_progresso') {
   // Copia em memoria: e a verdade da fila. O armazenamento e so a copia que
   // sobrevive ao recarregar a pagina. Se ele falhar, a fila continua.

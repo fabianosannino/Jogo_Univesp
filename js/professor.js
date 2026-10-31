@@ -5,12 +5,13 @@
 import { supabase } from './supabase.js';
 import { exigirProfessor, sair } from './auth.js';
 import { criarDb } from './db.js';
-import { criarFila } from './fila.js';
+import { criarFila, armazenamentoSeguro } from './fila.js';
 import { montarGrade } from './grade.js';
 import { renderGrade, renderListaSimples, renderSeletorAvatar, escaparHtml } from './render.js';
 
 const db = criarDb(supabase);
-const fila = criarFila(window.localStorage);
+const armazenamento = armazenamentoSeguro(() => window.localStorage);
+const fila = criarFila(armazenamento);
 
 const el = (seletor) => document.querySelector(seletor);
 
@@ -82,7 +83,7 @@ el('#turma-select').addEventListener('change', async (evento) => {
 // Marca, nesta maquina, qual turma a tela do aluno deve mostrar.
 el('#usar-turma').addEventListener('click', () => {
   if (!estado.turmaSelecionada) return;
-  window.localStorage.setItem('turma_ativa', estado.turmaSelecionada);
+  armazenamento.setItem('turma_ativa', estado.turmaSelecionada);
   const turma = estado.turmas.find((t) => t.id === estado.turmaSelecionada);
   avisar('#turma-ativa', `Este computador vai mostrar a turma "${turma.nome}" para os alunos.`);
 });
@@ -199,7 +200,7 @@ let professor;
 try {
   // O id do localStorage e lido antes de recarregarTurmas para que o Ruling C28
   // consiga validar o id contra a lista que chegara do banco.
-  estado.turmaSelecionada = window.localStorage.getItem('turma_ativa');
+  estado.turmaSelecionada = armazenamento.getItem('turma_ativa');
   professor = await exigirProfessor();
   document.querySelector('#identificacao').textContent = professor.email;
   await recarregarTurmas();

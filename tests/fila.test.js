@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { criarFila } from '../js/fila.js';
+import { criarFila, armazenamentoSeguro } from '../js/fila.js';
 
 // localStorage falso: a parte do contrato que a fila usa.
 function armazenamentoFalso(inicial = {}) {
@@ -163,4 +163,22 @@ test('enfileirar durante drenar nao perde itens da fila', async () => {
     (i) => i.aluno_id === 'x1' && i.acao === 'desmarcar',
   );
   assert.ok(desmarcarNaFila, 'desmarcar enfileirado durante drain deve sobreviver');
+});
+
+// Fix 1: armazenamentoSeguro -- tolera navegador que bloqueia localStorage
+test('armazenamentoSeguro devolve o proprio armazenamento quando o acesso funciona', () => {
+  const falso = armazenamentoFalso();
+  const resultado = armazenamentoSeguro(() => falso);
+  assert.strictEqual(resultado, falso, 'deve ser a mesma referencia');
+});
+
+test('armazenamentoSeguro devolve substituto inerte quando o acesso lanca', () => {
+  const substituto = armazenamentoSeguro(() => { throw new Error('bloqueado'); });
+  assert.equal(substituto.getItem('qualquer'), null, 'getItem deve devolver null');
+  assert.doesNotThrow(() => substituto.setItem('k', 'v'), 'setItem nao pode lancar');
+
+  // A fila deve seguir funcionando em memoria com o substituto
+  const fila = criarFila(armazenamentoSeguro(() => { throw new Error('bloqueado'); }));
+  fila.enfileirar(ITEM);
+  assert.equal(fila.tamanho(), 1, 'a fila sobrevive ao armazenamento bloqueado');
 });
