@@ -119,15 +119,20 @@ git checkout main && git merge perfil-login-progresso && git push
 ## 7. Duas decisoes de configuracao da autenticacao (do time, nao do codigo)
 
 Nenhuma das duas se resolve no repositorio: as duas sao chaves no painel do Supabase, em
-`Authentication` -> `Sign In / Providers` -> `Email`.
+`Authentication` -> `Sign In / Providers` -> `Email`. A primeira ja foi decidida; a
+segunda continua aberta.
 
-**"Confirm email" esta LIGADO, e para este projeto isso so atrapalha.** Ligado, cada
-cadastro tenta enviar um e-mail, e o remetente padrao do Supabase corta em poucas
-mensagens por hora — e ai o cadastro falha com `429` mesmo estando tudo certo. E a
-plataforma nao tem **nenhum** fluxo de e-mail: nao existe tela de confirmacao, nao existe
-"esqueci minha senha". Logo a confirmacao nao protege nada e custa o cadastro. Desligada,
-nenhum e-mail e enviado, nao ha cota para estourar e a sessao vem na hora.
-`js/auth.js:22` ja trata os dois casos e nao precisa mudar.
+**~~"Confirm email" esta LIGADO~~ — DESLIGADO em 2026-10-31.** Ligado, cada cadastro
+tentava enviar um e-mail, e o remetente padrao do Supabase corta em poucas mensagens por
+hora — e ai o cadastro falhava com `429` mesmo estando tudo certo. E a plataforma nao tem
+**nenhum** fluxo de e-mail: nao existe tela de confirmacao, nao existe "esqueci minha
+senha". Logo a confirmacao nao protegia nada e custava o cadastro.
+
+Conferido depois de desligar: `GET /auth/v1/settings` devolve `mailer_autoconfirm: true`,
+e um `POST /auth/v1/signup` novo respondeu **200 com `access_token` na resposta** — conta
+criada e sessao na mesma chamada, sem e-mail, sem cota para estourar. A conta descartavel
+da verificacao foi apagada; `auth.users` tem so as duas de teste e a do professor.
+`js/auth.js:23` ja tratava os dois casos e nao mudou.
 
 **`disable_signup` esta `false`: qualquer pessoa na internet pode criar conta de
 professor.** Nao e vazamento de dados — a RLS esta provada, cada conta so alcanca as
