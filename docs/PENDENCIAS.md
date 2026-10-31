@@ -1,53 +1,66 @@
 # O que falta para a plataforma funcionar
 
 Escrito em 2026-10-31, ao fim da branch `perfil-login-progresso`.
+Itens 1 e 2 resolvidos no mesmo dia; o restante continua aberto.
 
 Os 59 testes automatizados passam, e isso diz menos do que parece: eles provam que a
 logica de interface e de dados esta correta **isoladamente**. Nenhum deles toca o banco.
+Quem toca o banco sao os dois testes do item 2 — e esses agora rodaram.
 
-## 1. O esquema nunca foi aplicado (bloqueia tudo)
+## 1. ~~O esquema nunca foi aplicado~~ — APLICADO em 2026-10-31
 
-Sondando a API REST do projeto com a chave anon, as quatro tabelas respondem:
+Projeto `mdtuldswgsgewqfnggqe` (JOGOUNIVESP), via conector do Supabase. Rodou na ordem:
 
-```
-404 PGRST205 — Could not find the table 'public.turma' in the schema cache
-                                        'public.aluno'
-                                        'public.atividade'
-                                        'public.progresso'
-```
-
-`sql/schema.sql` e `sql/politicas.sql` existem no repositorio e **nunca rodaram**. A chave
-anon nao executa DDL; isto precisa do SQL Editor do painel do Supabase.
-
-Ordem obrigatoria:
-
-1. `sql/schema.sql` (tabelas, `unique (aluno_id, atividade_id, origem)`)
-2. `sql/politicas.sql` (Row Level Security)
+1. `sql/schema.sql` — migracao `esquema_perfil_login_progresso`
+2. `sql/politicas.sql` — migracao `politicas_isolamento_por_professor`
 3. `NOTIFY pgrst, 'reload schema';`
 
-O passo 3 nao e opcional. `js/db.js:112` usa o embed `aluno!inner(turma_id)`, que devolve
-`PGRST200` enquanto o cache do PostgREST estiver velho. E a unica linha de `db.js` que
-nao da para declarar correta so lendo o codigo.
+Estado conferido depois de aplicar:
 
-Depois, `sql/verificacao_esquema.sql` confere a estrutura — mas atencao: a linha 11 insere
-uma `turma` sem `professor` e so passa porque o SQL Editor roda como `postgres`, que tem
-BYPASSRLS. **Isso nao prova que a politica funciona.** Quem prova e o item 2.
+- As quatro tabelas respondem **200 com lista vazia** a chave anon, nao mais `404 PGRST205`.
+- O embed `aluno!inner(turma_id)` de `js/db.js:112` respondeu 200. Era a unica linha de
+  `db.js` impossivel de declarar correta so lendo o codigo; agora esta verificada.
+- `INSERT` anonimo em `turma` e recusado com `42501 new row violates row-level security
+  policy`. A RLS esta de fato no caminho, nao apenas ligada.
+- `pg_policies` lista as quatro politicas, uma por tabela.
+- Painel de seguranca do Supabase: nenhum aviso.
 
-## 2. Dois testes de integracao nunca rodaram
+As duas migracoes sao idempotentes (`create table if not exists`, `drop policy if exists`
+antes de cada `create policy`), entao rodar de novo nao quebra nada.
 
-- `tests/caminho_critico.integracao.js` — o fluxo inteiro contra o banco real
-- `tests/politicas.integracao.js` — um professor nao ve a turma do outro
+## 2. ~~Dois testes de integracao nunca rodaram~~ — RODARAM e PASSARAM em 2026-10-31
+
+```
+node tests/politicas.integracao.js      -> OK: um professor nao alcanca a turma do outro
+node tests/caminho_critico.integracao.js -> OK: caminho critico verificado de ponta a ponta
+```
+
+O de politicas e o que responde a pergunta que importa para a LGPD, e a resposta foi a
+desejada: o professor A nao alcanca a turma do professor B. Os dois limpam o que criam —
+as quatro tabelas voltaram a zero linhas depois da execucao.
 
 Nenhum dos dois termina em `.test.js`, de proposito: `npm test` tem de continuar rodando
-sem rede e sem conta. Rode-os a mao (`node tests/politicas.integracao.js`).
+sem rede e sem conta.
 
-Os dois exigem **duas contas de professor confirmadas**. Hoje
-`GET /auth/v1/settings` devolve `mailer_autoconfirm: false`, entao uma conta criada por
-signup nasce sem sessao e o login seguinte falha com "Email not confirmed". Ou confirme os
-dois e-mails de verdade, ou ligue o autoconfirm no painel.
+**Como as duas contas foram criadas** (vale saber, porque signup normal nao funciona aqui):
+`GET /auth/v1/settings` devolve `mailer_autoconfirm: false`, entao cada signup tenta enviar
+e-mail de confirmacao e o servico padrao do Supabase corta isso em poucos por hora —
+`429 over_email_send_rate_limit`. Como os enderecos sao `@example.com` (dominio reservado
+pela IANA, que nunca recebe e-mail), esse envio e desperdicio puro. As contas foram inseridas
+direto em `auth.users` com `email_confirmed_at` preenchido e senha via
+`crypt(senha, gen_salt('bf'))` — o mesmo bcrypt que o GoTrue valida.
 
-O teste de politicas e o unico que responde a pergunta que importa para a LGPD: se o
-professor A consegue ler os alunos do professor B, a plataforma nao pode ser usada.
+Uma pegadinha pela qual vale a pena nao passar duas vezes: `confirmation_token`,
+`recovery_token`, `email_change_token_new` e `email_change` sao nullable e **sem default**.
+Deixadas nulas, o login devolve `500 Database error querying schema`, porque o GoTrue as le
+em `string` do Go, que nao aceita `NULL`. Preencha as quatro com `''`.
+
+As credenciais estao em `.env.teste`, que o `.gitignore` bloqueia. Os testes as leem de
+variaveis de ambiente:
+
+```bash
+set -a && . ./.env.teste && set +a && node tests/politicas.integracao.js
+```
 
 ## 3. Verificacao manual no navegador
 

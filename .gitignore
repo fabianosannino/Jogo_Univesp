@@ -3,3 +3,8 @@
 
 # Build do jogo: 334 MB, nao entra no git (ver docs do plano).
 jogo/
+
+# Credenciais das duas contas de professor dos testes de integracao.
+# Sao contas de teste em @example.com (dominio reservado pela IANA, que nunca
+# recebe e-mail), mas senha em repositorio e senha vazada: fica fora.
+.env.teste
