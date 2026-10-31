@@ -1,7 +1,9 @@
 # O que falta para a plataforma funcionar
 
 Escrito em 2026-10-31, ao fim da branch `perfil-login-progresso`.
-Itens 1 e 2 resolvidos no mesmo dia; o restante continua aberto.
+Itens 1, 2 e 3 resolvidos no mesmo dia, mais a confirmacao de e-mail do item 7.
+Continuam abertos: o download do jogo (4), a mesclagem com `main` (5), o debito
+conhecido (6) e o autocadastro aberto (7).
 
 Os 59 testes automatizados passam, e isso diz menos do que parece: eles provam que a
 logica de interface e de dados esta correta **isoladamente**. Nenhum deles toca o banco.
@@ -62,20 +64,42 @@ variaveis de ambiente:
 set -a && . ./.env.teste && set +a && node tests/politicas.integracao.js
 ```
 
-## 3. Verificacao manual no navegador
+## 3. ~~Verificacao manual no navegador~~ — FEITA em 2026-10-31
 
-Nada disto foi verificado — a extensao do Chrome nao estava conectada nesta sessao.
+Tudo abaixo foi percorrido no Chrome, em `localhost:8777`, logado como
+`prof.a.teste@example.com`. Zero erro no console em qualquer momento. A turma de teste
+("3o ano B", doze alunos) foi apagada no fim; so a turma do professor sobrou no banco.
 
-- ~~**Review Focus 5**~~ — VERIFICADO em 2026-10-31, no navegador: `principal.html` sem
-  `turma_ativa` mostra "Este computador ainda nao foi preparado. Chame o professor." na
-  caixa de aviso, sem tela branca e com zero erro no console.
-- O caminho critico a mao: criar turma, cadastrar aluno com avatar, criar atividade,
-  marcar, abrir a tela do aluno, clicar no bichinho, ver a estrela, Voltar.
-- Acessibilidade: `Tab` percorre os avatares, `Enter`/`Espaco` abre o progresso, o foco e
-  visivel em cada parada, e uma turma de doze alunos e inteiramente alcancavel (rolagem
-  dentro de `#area-aluno`).
-- Com a rede desligada: marcar progresso, confirmar o aviso de pendencia, religar a rede e
-  confirmar que a fila esvazia e o aviso sai.
+- ~~**Review Focus 5**~~ — `principal.html` sem `turma_ativa` mostra "Este computador
+  ainda nao foi preparado. Chame o professor." na caixa de aviso, sem tela branca.
+- ~~**Caminho critico**~~ — login -> criar turma -> "Usar esta turma aqui" (que responde
+  "Este computador vai mostrar a turma ... para os alunos") -> dois alunos com avatares
+  diferentes -> atividade -> marcar na grade (Ana foi a 1/1 na hora) -> tela do aluno ->
+  abrir o bichinho -> **estrela** ao lado de "Contar ate 10" e "Voce ja conseguiu 1 de 1"
+  -> Voltar. Conferido no banco depois de cada passo.
+- ~~**Acessibilidade**~~ — `Tab` percorre os doze avatares na ordem de leitura, sem
+  nenhuma parada intrusa pelo caminho; o anel de foco e amarelo sobre o verde e visivel em
+  cada parada; `Enter` e `Espaco` abrem o progresso e `Espaco` aciona o Voltar. A celula da
+  grade se anuncia como "Marcar Contar ate 10 de Bruno" — nome do aluno e da atividade, nao
+  so "marcar". Os doze alunos couberam na tela sem rolagem na janela usada; a rolagem
+  dentro de `#area-aluno` nao chegou a ser exercitada, e e o unico item desta lista que
+  continua sem prova direta.
+- ~~**Rede caida**~~ — com `fetch` rejeitando `TypeError: Failed to fetch`, marcar o Bruno
+  pintou a celula **na hora** (1/1) e o topo da pagina passou a dizer "1 marcacao(oes)
+  aguardando a internet. Nao feche esta pagina."; o banco **nao** tinha o registro. Depois
+  de devolver o `fetch` e disparar o evento `online`, o progresso do Bruno apareceu no
+  banco com `origem = 'professor'` e o aviso saiu da tela sozinho.
+
+Uma ressalva honesta sobre o ultimo: a queda foi simulada trocando `window.fetch` por uma
+funcao que rejeita, nao desligando a placa de rede. O caminho exercitado e exatamente o
+que o codigo trata (`enviar()` lanca -> `catch` -> `fila.enfileirar`), e o retorno passou
+pelo mesmo listener de `online` que o navegador usaria. O que **nao** foi provado e que o
+Chrome dispara esse evento quando o Wi-Fi da escola volta — isso e comportamento do
+navegador, nao do codigo.
+
+Um detalhe de ferramenta, nao de produto: definir o valor de um campo por script sem
+disparar `input` nao faz o formulario gravar. Professor nenhum encontra isso, porque
+professor digita. Fica registrado so para a proxima pessoa que automatizar esta tela.
 
 ## 4. O download do jogo
 
@@ -114,7 +138,10 @@ git checkout main && git merge perfil-login-progresso && git push
 - Duas abas de `professor.html` abertas na mesma maquina sobrescrevem a fila offline uma
   da outra.
 - Redesenhar `#caixa-avatar` devolve o `<select>` para um avatar ja em uso; o rotulo
-  "(em uso)" avisa, mas nao impede.
+  "(em uso)" avisa, mas nao impede. **Visto no navegador em 2026-10-31**: depois de
+  cadastrar a Ana com a coruja, o campo voltou sozinho para "🦉 Coruja (em uso)". Numa
+  turma de doze, os doze primeiros avatares ficam marcados "(em uso)" e o campo continua
+  parando no primeiro deles — o professor tem de mexer no campo toda vez.
 
 ## 7. Duas decisoes de configuracao da autenticacao (do time, nao do codigo)
 
