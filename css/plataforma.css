@@ -92,3 +92,12 @@
   border-radius: 10px; text-decoration: none;
 }
 .botao-baixar:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+
+/* O .game do Pedro tem height:100vh e overflow:hidden, e nao e tocado.
+   Damos altura explicita ao container novo para que o max-height:100% do
+   #area-aluno resolva e ele possa rolar por conta propria. Sem isto, uma
+   turma de 20 alunos fica cortada e sem barra de rolagem. */
+#raiz-aluno {
+  height: calc(100vh - 140px);   /* desconta o <h1> do Pedro */
+  box-sizing: border-box;
+}
