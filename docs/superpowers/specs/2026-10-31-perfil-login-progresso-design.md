@@ -253,10 +253,20 @@ escola vai solicitar exclusão.
 As políticas de acesso do banco garantem que cada professor leia e escreva apenas nas
 suas próprias turmas.
 
-**Toda escrita exige a sessão autenticada do professor.** A tela do aluno é somente
-leitura, dentro da turma da sessão aberta naquela máquina. Um aluno que clique no avatar
-de um colega vê o progresso dele, mas não consegue alterá-lo — o banco recusa qualquer
-escrita que não venha do professor dono da turma.
+**Mas o isolamento para de valer dentro da mesma máquina**, e isso precisa estar escrito
+sem rodeio: a tela do aluno roda dentro da sessão do professor (D2). Para o banco, as
+duas telas são o *mesmo* usuário autenticado. Logo o banco **não** tem como recusar uma
+escrita vinda da tela do aluno — ele não consegue distinguir uma da outra.
+
+A tela do aluno é somente leitura **porque não oferece nenhum controle de escrita**, não
+porque o servidor a proíba. Quem abrir as ferramentas de desenvolvedor naquela máquina
+escreve como se fosse o professor.
+
+Tornar isso uma garantia de servidor exigiria que a tela do aluno rodasse *deslogada*,
+com uma política de leitura pública por turma — ou seja, expor nomes e avatares de
+menores num endereço público. O custo é maior que o risco que remove, dado que o
+ambiente previsto (R6) é uma máquina de laboratório sob supervisão do professor.
+Registrado como lacuna 2.
 
 ## 8. Fluxos
 
@@ -297,9 +307,13 @@ Um teste automatizado cobrindo o caminho que não pode quebrar:
 Se esse caminho falhar, a plataforma não serve para nada. O restante é verificado
 manualmente.
 
-Um segundo teste cobre a garantia de leitura: a tela do aluno não consegue gravar
-progresso, mesmo que a chamada seja feita direto no console. É a verificação de que a
-política do banco está de fato ativa, e não só descrita neste documento.
+Um segundo teste cobre o isolamento que o banco **de fato** garante: um professor não lê
+nem escreve na turma de outro professor. Rodado contra o banco real, porque é exatamente
+a política do servidor que está sendo verificada — e uma política de acesso que só existe
+no documento não protege ninguém.
+
+Esse teste *não* tenta provar que a tela do aluno é incapaz de escrever: dentro da mesma
+máquina ela é capaz, por consequência de D2, e isso está registrado como lacuna 2.
 
 Além disso, uma checagem manual de acessibilidade: navegação por teclado, tamanho dos
 alvos de clique, e contraste suficiente para baixa visão.
@@ -312,9 +326,12 @@ Registradas deliberadamente, não construídas:
    de propósito. Não há verificação de identidade na tela de leitura. O dado visível é
    nome, avatar e atividades concluídas — nada sensível. Se isso incomodar a escola, é o
    ponto onde o PIN entra (D3).
-2. **A sessão do professor fica aberta na máquina.** Conveniente e necessário para o
-   fluxo; implica que a máquina do laboratório deve ser tratada como ambiente confiável.
-   Quem usar aquela máquina tem acesso de escrita às turmas daquele professor.
+2. **A sessão do professor fica aberta na máquina**, e é dela que a tela do aluno também
+   depende. Consequência: naquela máquina, o acesso de escrita às turmas daquele professor
+   está disponível a quem souber usar o console do navegador. A máquina de laboratório tem
+   de ser tratada como ambiente confiável e supervisionado — é uma premissa do design, não
+   um descuido. Resolver isso de verdade significaria rodar a tela do aluno deslogada, com
+   leitura pública por turma, e expor dados de menores publicamente.
 3. **Progresso é observado pelo professor, não medido pelo jogo.** Consequência direta de
    R2, e não se resolve sem a build WebGL.
 
