@@ -124,3 +124,43 @@ test('armazenamento indisponivel nao derruba a fila', () => {
   fila.enfileirar(ITEM);
   assert.equal(fila.tamanho(), 1, 'a fila segue na memoria mesmo sem conseguir gravar');
 });
+
+// Corrida: enfileirar durante drenar nao pode perder item
+test('enfileirar durante drenar nao perde itens da fila', async () => {
+  // Cenario: fila tem [A, B]. Durante o envio de A, o usuario clica em desmarcar A
+  // (mesma celula, acao oposta). Isso chama splice(0,1) no array ao vivo. O iterador
+  // de for...of sobre array usa cursor numerico: o item B, que estava no indice 1,
+  // cai para o indice 0, mas o cursor ja avancou para 1 -- B e pulado e some.
+  const itemA = { acao: 'marcar', aluno_id: 'x1', atividade_id: 'z1' };
+  const itemB = { acao: 'marcar', aluno_id: 'x2', atividade_id: 'z1' };
+  const fila = criarFila(armazenamentoFalso());
+  fila.enfileirar(itemA);
+  fila.enfileirar(itemB);
+
+  let primeiraVez = true;
+  const enviados = [];
+  await fila.drenar(async (item) => {
+    if (primeiraVez) {
+      primeiraVez = false;
+      // Simula o usuario clicando "desmarcar x1" enquanto o envio de A esta em voo.
+      // splice remove A do array; o iterador pula B.
+      fila.enfileirar({ acao: 'desmarcar', aluno_id: 'x1', atividade_id: 'z1' });
+    }
+    enviados.push(item);
+  });
+
+  // Invariante 1: A foi enviado (estava no snapshot)
+  assert.ok(enviados.some((i) => i.aluno_id === 'x1'), 'A deve ter sido enviado');
+
+  // Invariante 2: B nao pode sumir -- ou foi enviado, ou esta na fila
+  const bEnviado = enviados.some((i) => i.aluno_id === 'x2');
+  const bNaFila  = fila.itens().some((i) => i.aluno_id === 'x2');
+  assert.ok(bEnviado || bNaFila, 'B nao pode desaparecer silenciosamente');
+
+  // Invariante 3: desmarcar x1 enfileirado durante o drain nao pode sumir
+  // (se A foi enviado com sucesso, desmarcar x1 deve estar na fila para a proxima tentativa)
+  const desmarcarNaFila = fila.itens().some(
+    (i) => i.aluno_id === 'x1' && i.acao === 'desmarcar',
+  );
+  assert.ok(desmarcarNaFila, 'desmarcar enfileirado durante drain deve sobreviver');
+});
