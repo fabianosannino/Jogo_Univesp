@@ -35,7 +35,7 @@ export const AVATARES = [
   { id: 'papagaio',  rotulo: 'Papagaio',  emoji: '\u{1F99C}' },
   { id: 'hamster',   rotulo: 'Hamster',   emoji: '\u{1F439}' },
   { id: 'zebra',     rotulo: 'Zebra',     emoji: '\u{1F993}' },
-  { id: 'tubarao',   rotulo: 'Tubarao',   emoji: '\u{1F988}' },
+  { id: 'girafa',    rotulo: 'Girafa',    emoji: '\u{1F992}' },
   { id: 'vaca',      rotulo: 'Vaca',      emoji: '\u{1F404}' },
   { id: 'urso',      rotulo: 'Urso',      emoji: '\u{1F43B}' },
 ];
