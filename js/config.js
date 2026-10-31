@@ -5,12 +5,20 @@
 export const SUPABASE_URL = 'https://mdtuldswgsgewqfnggqe.supabase.co';
 export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kdHVsZHN3Z3NnZXdxZm5nZ3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MTY0NjgsImV4cCI6MjEwODk5MjQ2OH0.6KAGjv99WSmdex_tpGCSDXz6eJwwJsH6XgMw-FKM6Ak';
 
-// Onde o jogo esta hospedado para download. VAZIA de proposito: a build tem
-// 334 MB e nao entra no git (o limite do GitHub e 100 MB por arquivo), entao
-// ela precisa de um asset de Release ou equivalente. Enquanto esta string for
-// vazia, a tela do aluno simplesmente nao mostra link nenhum — nunca um link
-// quebrado. Para ligar o download, cole a URL aqui e nada mais muda.
-export const URL_DOWNLOAD_JOGO = '';
+// Onde o jogo esta hospedado para download.
+//
+// A build nao entra no git: o limite do GitHub e 100 MB por arquivo e a pasta
+// tem 334 MB. Mora como asset de Release, que nao tem esse limite e serve o
+// arquivo sem exigir conta: o professor clica e baixa.
+//
+// A pasta publicada e 203 MB, nao 334: sairam os 130 MB de arquivos .pdb e a
+// pasta BurstDebugInformation_DoNotShip, que o proprio Unity nomeia assim.
+// Nada disso e lido para jogar -- so um depurador abre .pdb.
+//
+// Se esta string voltar a ficar vazia, a tela do aluno para de mostrar o link
+// em vez de mostrar um link quebrado. Trocar de hospedagem e trocar esta linha.
+export const URL_DOWNLOAD_JOGO =
+  'https://github.com/fabianosannino/Jogo_Univesp/releases/download/jogo-v1.01/Jogos-Educativos-2-v1.01-windows.zip';
 
 // Avatares em emoji: nenhum arquivo de imagem para carregar, funciona sem
 // rede, e cresce no tamanho que a tela precisar sem perder nitidez.

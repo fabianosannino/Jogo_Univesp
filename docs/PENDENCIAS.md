@@ -1,11 +1,13 @@
 # O que falta para a plataforma funcionar
 
 Escrito em 2026-10-31, ao fim da branch `perfil-login-progresso`.
-Itens 1, 2, 3 e 5 resolvidos no mesmo dia, mais a confirmacao de e-mail do item 7.
-Continuam abertos: o download do jogo (4), o debito conhecido (6) e o autocadastro
-aberto (7) — este ultimo porque e chave de painel, nao linha de codigo.
+Itens 1, 2, 3, 4 e 5 resolvidos no mesmo dia, mais a confirmacao de e-mail do item 7.
+Continuam abertos: o debito conhecido (6) e o autocadastro aberto (7) — este ultimo porque
+e chave de painel, nao linha de codigo, e so quem entra no painel do Supabase pode virar.
+O item 4 fechou com uma ressalva que vale ler: a build publicada parece ser um
+Development Build, e isso so se resolve recompilando no Unity.
 
-Os 59 testes automatizados passam, e isso diz menos do que parece: eles provam que a
+Os 71 testes automatizados passam, e isso diz menos do que parece: eles provam que a
 logica de interface e de dados esta correta **isoladamente**. Nenhum deles toca o banco.
 Quem toca o banco sao os dois testes do item 2 — e esses agora rodaram.
 
@@ -101,19 +103,69 @@ Um detalhe de ferramenta, nao de produto: definir o valor de um campo por script
 disparar `input` nao faz o formulario gravar. Professor nenhum encontra isso, porque
 professor digita. Fica registrado so para a proxima pessoa que automatizar esta tela.
 
-## 4. O download do jogo
+## 4. ~~O download do jogo~~ — PUBLICADO em 2026-10-31
 
-A build existe (`Jogo v.1.01`), tem **334 MB** e nao entra no git: o limite do GitHub e
-100 MB por arquivo, e nem zipada cabe. Entao `js/config.js` tem
+O jogo esta no ar:
 
-```js
-export const URL_DOWNLOAD_JOGO = '';
-```
+<https://github.com/fabianosannino/Jogo_Univesp/releases/tag/jogo-v1.01>
 
-Vazia, nenhum link aparece na tela da crianca — nunca um link quebrado. Para ligar o
-download: publique a build como asset de Release do GitHub (ou Drive), cole a URL nessa
-constante, e inverta o teste "sem URL configurada, nenhuma tela do aluno mostra link de
-download" em `tests/render.test.js`. Nada mais muda.
+`URL_DOWNLOAD_JOGO` em `js/config.js` aponta para o arquivo, e o botao "Baixar o jogo"
+aparece em todas as telas da crianca. O teste que afirmava o contrario foi invertido:
+agora `tests/render.test.js` exige o botao nas cinco telas e exige que a URL seja
+`https`. Sao 71 testes passando.
+
+O arquivo e um asset de Release, nao um arquivo do repositorio: asset de Release nao tem
+o limite de 100 MB por arquivo, e o GitHub o serve sem pedir conta. O professor clica e
+baixa.
+
+### O que foi retirado da build antes de publicar
+
+A pasta original tem 334 MB. A publicada tem 203 MB, e zipada da 74 MB. Sairam:
+
+- **130 MB de arquivos `.pdb`** (131 deles). `.pdb` e arquivo de simbolos de depuracao:
+  so um depurador acoplado ao programa abre um. Nenhum processo do Windows le `.pdb` para
+  rodar o jogo.
+- a pasta **`Jogos Educativos 2_BurstDebugInformation_DoNotShip`** — o nome e do proprio
+  Unity, e `DoNotShip` quer dizer "nao distribua".
+
+Isso nao mexeu em nada que o jogo executa: o `.exe`, a `UnityPlayer.dll`, a pasta `_Data`
+e o `MonoBleedingEdge` foram inteiros.
+
+### O que NAO deu para consertar daqui — e e importante
+
+A build parece ser um **Development Build** do Unity, nao uma build de release. Duas
+evidencias:
+
+1. `Jogos Educativos 2_Data/boot.config` traz
+   ```
+   player-connection-mode=Listen
+   player-connection-ip=192.168.1.101
+   player-connection-project-name=Jogos Educativos 2
+   ```
+2. entre os simbolos retirados havia `UnityPlayer_Win64_player_development_mono_x64.pdb`
+   — o `_development_` no nome e do compilador, nao e coincidencia.
+
+Duas consequencias praticas:
+
+- **`192.168.1.101` e o IP da maquina de quem compilou**, dentro da rede de casa dele.
+  E um endereco privado (a faixa `192.168.x.x` nao e alcancavel pela internet), entao nao
+  da para ninguem chegar naquele computador por causa disto. O que vaza e so o detalhe de
+  que aquela rede usa a faixa padrao de roteador domestico. Risco baixo, mas o repositorio
+  e **publico**: qualquer pessoa pode baixar o zip e ler esse arquivo.
+- `player-connection-mode=Listen` significa que o jogo **abre uma porta e fica esperando**
+  o profiler do Unity se conectar. Num computador de escola isso e uma porta aberta sem
+  motivo. Nao e uma porta de entrada conhecida para invasao, mas uma build de release
+  simplesmente nao tem isso.
+
+**O conserto e no Unity, nao aqui:** recompilar com a caixa **"Development Build"**
+desmarcada em `File > Build Settings`. Isso remove o `player-connection-*` do
+`boot.config`, os simbolos de desenvolvimento e a pasta `DoNotShip` de uma vez — e deixa o
+jogo mais leve e mais rapido de brinde. Nao editei o `boot.config` a mao de proposito:
+mexer no miolo de uma build de outra pessoa sem poder testar o resultado troca um problema
+pequeno e conhecido por um desconhecido.
+
+Quando a build nova sair, o caminho e curto: subir o novo zip como asset (ou criar
+`jogo-v1.02`) e trocar a URL em `js/config.js`. O resto do codigo nao muda.
 
 ## 5. ~~A mesclagem com `main`~~ — FEITA em 2026-10-31
 

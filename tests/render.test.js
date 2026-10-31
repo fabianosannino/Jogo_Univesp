@@ -164,20 +164,41 @@ test('area do aluno nao tem nenhum controle de escrita', () => {
   }
 });
 
-// Este teste afirma o verdadeiro hoje: URL_DOWNLOAD_JOGO e vazia, logo nenhuma
-// tela mostra link de download. Quando a build dos 334 MB tiver endereco, a
-// constante recebe a URL e este teste e que deve ser invertido — nao a funcao.
-test('sem URL configurada, nenhuma tela do aluno mostra link de download', () => {
-  assert.equal(URL_DOWNLOAD_JOGO, '', 'o jogo ainda nao esta hospedado');
+// O jogo foi publicado: a build mora num asset de Release e URL_DOWNLOAD_JOGO
+// aponta para ela. Antes disto o teste afirmava o contrario (constante vazia,
+// nenhum link em tela nenhuma) — era o verdadeiro daquele dia.
+//
+// O link tem de aparecer em TODAS as telas da crianca, inclusive nas de erro e
+// de carregando: a crianca que chegou na tela do aluno veio para jogar, e se o
+// banco esta fora do ar o download e justamente a unica coisa que ainda
+// funciona. Esconder o botao quando da erro seria tirar o jogo da crianca por
+// causa de um problema do servidor.
+test('com o jogo publicado, toda tela do aluno oferece o download', () => {
+  assert.notEqual(URL_DOWNLOAD_JOGO, '', 'o jogo precisa estar hospedado');
+
+  const alunos = [{ id: 'a1', nome: 'Ana', avatar: 'coruja' }];
+  const atividades = [{ id: 't1', titulo: 'Contar ate 10', ordem: 1 }];
+  const g = montarGrade(alunos, atividades, [
+    { aluno_id: 'a1', atividade_id: 't1', origem: 'professor' },
+  ]);
 
   const telas = [
     renderAreaAluno({ estado: 'sem-turma' }),
     renderAreaAluno({ estado: 'carregando' }),
     renderAreaAluno({ estado: 'erro' }),
-    renderAreaAluno({ estado: 'escolher', alunos: [{ id: 'a1', nome: 'Ana', avatar: 'coruja' }] }),
+    renderAreaAluno({ estado: 'escolher', alunos }),
+    renderAreaAluno({ estado: 'progresso', linha: montarLinhaDoAluno(g, 'a1') }),
   ];
 
   for (const html of telas) {
-    assert.ok(!html.includes('botao-baixar'), 'nenhum link quebrado na tela da crianca');
+    assert.match(html, /class="botao-baixar"/, 'falta o botao de baixar');
+    assert.ok(html.includes(`href="${URL_DOWNLOAD_JOGO}"`), 'o href nao e a URL configurada');
   }
+});
+
+// Um endereco http:// num link que a escola vai clicar e um download que
+// qualquer rede intermediaria pode trocar por outro arquivo. Este teste nao
+// deixa a constante cair para http por descuido numa troca de hospedagem.
+test('a URL do jogo e https', () => {
+  assert.match(URL_DOWNLOAD_JOGO, /^https:\/\//, 'o download tem de ser por https');
 });
