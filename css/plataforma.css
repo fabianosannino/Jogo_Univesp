@@ -10,6 +10,63 @@
   border-radius: 6px;
 }
 
+/* --- painel do professor --- */
+
+/* O body.stars do style.css pinta um ::before em position:fixed cobrindo a tela
+   toda com a animacao de estrelas. O .game do Pedro escapa dela com z-index:1;
+   sem o mesmo truque aqui, o painel inteiro fica desenhado DEBAIXO da animacao
+   e a tela parece vazia, com so os tracos coloridos aparecendo.
+   O max-height com overflow existe porque o body e flex centralizado: sem ele,
+   um painel mais alto que a janela fica cortado em cima e embaixo. */
+.painel {
+  position: relative;
+  z-index: 1;
+  width: min(900px, 94vw);
+  max-height: 94vh;
+  overflow-y: auto;
+  background: #fff;
+  color: #111;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, .45);
+}
+
+.painel-topo { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.painel-topo h1 { font-size: 1.8rem; margin-right: auto; }
+#identificacao { color: #444; }
+
+.bloco { margin-top: 24px; padding-top: 16px; border-top: 2px solid #e3e3e3; }
+.bloco h2 { font-size: 1.3rem; margin-bottom: 12px; }
+
+/* O reset `*{margin:0;padding:0}` do style.css deixa campo e botao sem forma
+   nenhuma. Alvo minimo de 44px porque o professor usa isto com pressa. */
+.painel label { display: block; margin: 12px 0 4px; font-weight: 600; }
+.painel input[type="text"],
+.painel select {
+  width: min(360px, 100%);
+  min-height: 44px;
+  font-size: 1rem;
+  padding: 8px 10px;
+  border: 2px solid #777;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+}
+.painel form button,
+.painel-topo button,
+#usar-turma {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  border: 2px solid #10532f;
+  border-radius: 6px;
+  background: #1b7f4b;
+  color: #fff;
+  cursor: pointer;
+}
+.painel :focus-visible { outline: 3px solid #0057d9; outline-offset: 2px; }
+
 /* --- grade do professor --- */
 
 .grade { border-collapse: collapse; width: 100%; background: #fff; color: #111; }

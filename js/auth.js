@@ -29,12 +29,26 @@ export async function sair() {
   await supabase.auth.signOut();
 }
 
+// getUser() sem nenhuma sessao NAO devolve user nulo: devolve
+// AuthSessionMissingError. Isso e ausencia de sessao, nao falha de verificacao,
+// e sem esta distincao quem abre professor.html deslogado le "Auth session
+// missing!" em ingles no lugar de ser levado para a tela de entrar.
+function ausenciaDeSessao(error) {
+  return (
+    error.name === 'AuthSessionMissingError' ||
+    String(error.message ?? '').toLowerCase().includes('auth session missing')
+  );
+}
+
 export async function professorAtual() {
   const { data, error } = await supabase.auth.getUser();
   // "Nao ha sessao" e "nao consegui verificar" sao coisas diferentes. Tratar os
   // dois como ausencia de sessao expulsa um professor logado para o login quando
   // a internet da escola oscila -- e, se oscilar de novo, em laco.
-  if (error) throw new Error(traduzir(error.message));
+  if (error) {
+    if (ausenciaDeSessao(error)) return null;
+    throw new Error(traduzir(error.message));
+  }
   return simplificar(data?.user ?? null);
 }
 
