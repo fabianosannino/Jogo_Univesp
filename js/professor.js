@@ -116,6 +116,10 @@ el('#form-aluno').addEventListener('submit', async (evento) => {
     return;
   }
   const campo = el('#aluno-nome');
+  if (!campo.value.trim()) {
+    avisar('#aviso-fila', 'Escreva o primeiro nome do aluno.');
+    return;
+  }
   try {
     await db.criarAluno(
       estado.turmaSelecionada,
@@ -278,6 +282,14 @@ document.addEventListener('click', async (evento) => {
 
 // Quando a conexao volta, reenvia o que ficou para tras.
 window.addEventListener('online', escoarFila);
+
+// Se a sessao cair ou expirar no meio da manha, o professor tem de descobrir
+// na hora. Sem isto ele segue marcando numa tela que nao grava mais nada.
+supabase.auth.onAuthStateChange((evento) => {
+  if (evento === 'SIGNED_OUT') {
+    window.location.replace('login.html');
+  }
+});
 
 // Ruling C29: a inicializacao nao pode deixar a tela em branco se a rede cair.
 // exigirProfessor rejeita de duas formas:

@@ -6,9 +6,18 @@
 
 // O Supabase devolve { data, error }. Transformar error em excecao evita que
 // cada tela precise lembrar de checar.
+//
+// O codigo vem junto: '23505' (duplicata), '42501' (RLS recusou), 'PGRST205'
+// (tabela nao existe), 'PGRST301' (token expirado) sao problemas diferentes, e
+// achatar os quatro numa frase so torna qualquer diagnostico impossivel. Quem
+// trata so `e.message` continua funcionando igual.
 async function pegar(consulta, padrao) {
   const { data, error } = await consulta;
-  if (error) throw new Error(error.message ?? 'falha ao acessar o banco');
+  if (error) {
+    const e = new Error(error.message ?? 'falha ao acessar o banco');
+    e.codigo = error.code ?? null;
+    throw e;
+  }
   return data ?? padrao;
 }
 
@@ -108,13 +117,21 @@ export function criarDb(cliente) {
       );
     },
 
+    // upsert, nao insert: a fila offline reenvia o que nao teve resposta, e
+    // schema.sql tem unique(aluno_id, atividade_id, origem). Com insert, o
+    // reenvio de uma marcacao que JA gravou devolve 23505 para sempre, a fila
+    // nunca esvazia e o professor fica com o aviso de pendencia o dia inteiro.
+    // Marcar duas vezes tem de ser o mesmo que marcar uma vez.
     async marcar(idAluno, idAtividade) {
       await pegar(
-        cliente.from('progresso').insert({
-          aluno_id: idAluno,
-          atividade_id: idAtividade,
-          origem: 'professor',
-        }),
+        cliente.from('progresso').upsert(
+          {
+            aluno_id: idAluno,
+            atividade_id: idAtividade,
+            origem: 'professor',
+          },
+          { onConflict: 'aluno_id,atividade_id,origem', ignoreDuplicates: true }
+        ),
         null
       );
     },

@@ -40,7 +40,10 @@
 
 /* --- area do aluno --- */
 
-#area-aluno { color: #fff; padding: 24px; overflow-y: auto; max-height: 100%; }
+/* Verde-escuro, nao branco: este bloco e desenhado dentro do .game do colega,
+   que tem background #32dbb1 (style.css). Branco sobre esse verde da 1,76:1 de
+   contraste e some da tela. #10361f da 7,58:1. */
+#area-aluno { color: #10361f; padding: 24px; overflow-y: auto; max-height: 100%; }
 .convite { font-size: 1.8rem; text-align: center; }
 
 .avatares { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
@@ -92,6 +95,16 @@
   border-radius: 10px; text-decoration: none;
 }
 .botao-baixar:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+
+/* --- link para a tela do aluno --- */
+
+/* Cor escura sobre fundo claro: contraste seguro em qualquer tema do style.css. */
+.link-aluno {
+  display: inline-block; margin-top: 12px;
+  font-size: 1.1rem; font-weight: 600;
+  color: #0b6b45; text-decoration: underline;
+}
+.link-aluno:focus-visible { outline: 3px solid #0057d9; outline-offset: 2px; }
 
 /* O .game do Pedro tem height:100vh e overflow:hidden, e nao e tocado.
    Damos altura explicita ao container novo para que o max-height:100% do

@@ -7,9 +7,10 @@ import { criarDb } from '../js/db.js';
 function clienteFalso(resposta = { data: [], error: null }) {
   const chamadas = [];
   const alvo = {
-    select(cols)      { chamadas.push(['select', cols]);      return alvo; },
-    insert(linhas)    { chamadas.push(['insert', linhas]);    return alvo; },
-    delete()          { chamadas.push(['delete']);            return alvo; },
+    select(cols)            { chamadas.push(['select', cols]);            return alvo; },
+    insert(linhas)          { chamadas.push(['insert', linhas]);          return alvo; },
+    upsert(linhas, opcoes)  { chamadas.push(['upsert', linhas, opcoes]);  return alvo; },
+    delete()                { chamadas.push(['delete']);                   return alvo; },
     eq(col, val)      { chamadas.push(['eq', col, val]);      return alvo; },
     order(col, opts)  { chamadas.push(['order', col, opts]);  return alvo; },
     single()          { chamadas.push(['single']);            return alvo; },
@@ -71,12 +72,13 @@ test('marcar grava origem professor', async () => {
   const cliente = clienteFalso({ data: null, error: null });
   await criarDb(cliente).marcar('a1', 'at1');
 
-  const insert = cliente.chamadas.find(([m]) => m === 'insert');
-  assert.deepEqual(insert[1], {
+  const upsert = cliente.chamadas.find(([m]) => m === 'upsert');
+  assert.deepEqual(upsert[1], {
     aluno_id: 'a1',
     atividade_id: 'at1',
     origem: 'professor',
   });
+  assert.equal(upsert[2].onConflict, 'aluno_id,atividade_id,origem');
 });
 
 test('desmarcar apaga apenas o registro do professor', async () => {

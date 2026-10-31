@@ -24,6 +24,20 @@ export const AVATARES = [
   { id: 'unicornio', rotulo: 'Unicornio', emoji: '\u{1F984}' },
   { id: 'caranguejo',rotulo: 'Caranguejo',emoji: '\u{1F980}' },
   { id: 'joaninha',  rotulo: 'Joaninha',  emoji: '\u{1F41E}' },
+  { id: 'coelho',    rotulo: 'Coelho',    emoji: '\u{1F430}' },
+  { id: 'pato',      rotulo: 'Pato',      emoji: '\u{1F986}' },
+  { id: 'cavalo',    rotulo: 'Cavalo',    emoji: '\u{1F434}' },
+  { id: 'porco',     rotulo: 'Porco',     emoji: '\u{1F437}' },
+  { id: 'pintinho',  rotulo: 'Pintinho',  emoji: '\u{1F425}' },
+  { id: 'peixe',     rotulo: 'Peixe',     emoji: '\u{1F41F}' },
+  { id: 'cobra',     rotulo: 'Cobra',     emoji: '\u{1F40D}' },
+  { id: 'polvo',     rotulo: 'Polvo',     emoji: '\u{1F419}' },
+  { id: 'papagaio',  rotulo: 'Papagaio',  emoji: '\u{1F99C}' },
+  { id: 'hamster',   rotulo: 'Hamster',   emoji: '\u{1F439}' },
+  { id: 'zebra',     rotulo: 'Zebra',     emoji: '\u{1F993}' },
+  { id: 'tubarao',   rotulo: 'Tubarao',   emoji: '\u{1F988}' },
+  { id: 'vaca',      rotulo: 'Vaca',      emoji: '\u{1F404}' },
+  { id: 'urso',      rotulo: 'Urso',      emoji: '\u{1F43B}' },
 ];
 
 export function acharAvatar(id) {

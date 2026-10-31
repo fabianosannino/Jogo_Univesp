@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { AVATARES } from '../js/config.js';
 
 test('existe avatar suficiente para uma turma', () => {
-  assert.ok(AVATARES.length >= 12, 'uma turma tem 20 a 30 alunos; 12 e o minimo util');
+  assert.ok(AVATARES.length >= 30, 'cada crianca precisa de um bichinho so dela; turmas chegam a 30 alunos');
 });
 
 test('todo avatar tem id, rotulo e emoji', () => {
