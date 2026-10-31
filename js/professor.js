@@ -184,12 +184,100 @@ el('#sair').addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
-// desenharGrade e a ligacao com a Task 9. Por enquanto so desenha.
+// Sinalizador: verdadeiro quando #aviso-fila exibe uma mensagem de pendencia.
+// Evita que mostrarPendencias apague um erro exibido por erroNaTela.
+let avisoFila = false;
+
 function desenharGrade() {
   el('#area-grade').innerHTML = renderGrade(
     montarGrade(estado.alunos, estado.atividades, estado.progresso)
   );
+  mostrarPendencias();
 }
+
+function mostrarPendencias() {
+  const quantas = fila.tamanho();
+  if (quantas > 0) {
+    avisar(
+      '#aviso-fila',
+      `${quantas} marcacao(oes) aguardando a internet. Nao feche esta pagina.`
+    );
+    avisoFila = true;
+  } else if (avisoFila) {
+    // So limpa se a mensagem atual e nossa; nunca apaga erro de erroNaTela.
+    avisar('#aviso-fila', '');
+    avisoFila = false;
+  }
+}
+
+// Altera o estado local antes de falar com o banco: a tela responde na hora,
+// e e a fila que garante a chegada. O professor nao espera a rede.
+function aplicarLocalmente(item) {
+  if (item.acao === 'marcar') {
+    estado.progresso.push({
+      aluno_id: item.aluno_id,
+      atividade_id: item.atividade_id,
+      origem: 'professor',
+    });
+  } else {
+    estado.progresso = estado.progresso.filter(
+      (p) => !(
+        p.aluno_id === item.aluno_id &&
+        p.atividade_id === item.atividade_id &&
+        p.origem === 'professor'
+      )
+    );
+  }
+}
+
+function enviar(item) {
+  return item.acao === 'marcar'
+    ? db.marcar(item.aluno_id, item.atividade_id)
+    : db.desmarcar(item.aluno_id, item.atividade_id);
+}
+
+async function escoarFila() {
+  await fila.drenar(enviar);
+  mostrarPendencias();
+}
+
+// Celulas em voo: chave aluno_id + '\u0000' + atividade_id.
+// Garante que duplo clique rapido nao dispare dois envios (Review Focus 2).
+// O Set vive fora do DOM e sobrevive ao redesenho do innerHTML.
+const emVoo = new Set();
+
+document.addEventListener('click', async (evento) => {
+  const celula = evento.target.closest('.celula');
+  if (!celula) return;
+
+  const chave = `${celula.dataset.aluno}\u0000${celula.dataset.atividade}`;
+  if (emVoo.has(chave)) return;
+  emVoo.add(chave);
+
+  const marcada = celula.getAttribute('aria-pressed') === 'true';
+  const item = {
+    acao: marcada ? 'desmarcar' : 'marcar',
+    aluno_id: celula.dataset.aluno,
+    atividade_id: celula.dataset.atividade,
+  };
+
+  aplicarLocalmente(item);
+  desenharGrade();          // redesenha ja marcado: resposta imediata
+
+  try {
+    await enviar(item);
+  } catch {
+    // Sem rede, ou o banco recusou. Guarda para reenviar depois; a marcacao
+    // ja esta visivel e nao se perde ao recarregar a pagina.
+    fila.enfileirar(item);
+    mostrarPendencias();
+  } finally {
+    emVoo.delete(chave);
+  }
+});
+
+// Quando a conexao volta, reenvia o que ficou para tras.
+window.addEventListener('online', escoarFila);
 
 // Ruling C29: a inicializacao nao pode deixar a tela em branco se a rede cair.
 // exigirProfessor rejeita de duas formas:
@@ -205,6 +293,7 @@ try {
   document.querySelector('#identificacao').textContent = professor.email;
   await recarregarTurmas();
   await recarregarTurma();
+  await escoarFila();       // havia pendencia de uma sessao anterior?
 } catch (e) {
   // 'sem sessao': exigirProfessor ja chamou location.replace; a pagina esta
   // saindo. Qualquer mensagem piscaria e sumira — nao exibir nada.
