@@ -53,11 +53,9 @@ professor A consegue ler os alunos do professor B, a plataforma nao pode ser usa
 
 Nada disto foi verificado — a extensao do Chrome nao estava conectada nesta sessao.
 
-- **Review Focus 5:** abrir `principal.html` em janela anonima (sem `localStorage`).
-  Esperado: a caixa "Este computador ainda nao foi preparado. Chame o professor." Sem tela
-  branca, sem erro vermelho no console. O que esta provado por teste e que
-  `renderAreaAluno({ estado: 'sem-turma' })` devolve a frase certa; o que **nao** esta
-  provado e a fiacao, isto e, que `js/aluno.js` chega nesse estado.
+- ~~**Review Focus 5**~~ — VERIFICADO em 2026-10-31, no navegador: `principal.html` sem
+  `turma_ativa` mostra "Este computador ainda nao foi preparado. Chame o professor." na
+  caixa de aviso, sem tela branca e com zero erro no console.
 - O caminho critico a mao: criar turma, cadastrar aluno com avatar, criar atividade,
   marcar, abrir a tela do aluno, clicar no bichinho, ver a estrela, Voltar.
 - Acessibilidade: `Tab` percorre os avatares, `Enter`/`Espaco` abre o progresso, o foco e
