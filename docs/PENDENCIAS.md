@@ -1,5 +1,8 @@
 # O que falta para a plataforma funcionar
 
+**A plataforma esta no ar desde 2026-11-01:**
+<https://fabianosannino.github.io/Jogo_Univesp/> (item 8, no fim deste documento).
+
 Escrito em 2026-10-31, ao fim da branch `perfil-login-progresso`.
 Itens 1, 2, 3, 4 e 5 resolvidos no mesmo dia, mais a confirmacao de e-mail do item 7.
 Continuam abertos: o debito conhecido (6) e o autocadastro aberto (7) — este ultimo porque
@@ -314,3 +317,44 @@ Um aviso para nao se enganar depois: **esconder ou apagar `cadastro.html` nao fe
 autocadastro.** A pagina e so um formulario; o endereco `/auth/v1/signup` do projeto
 continua aberto a quem souber o que e a chave anon esta no `js/config.js`, visivel para
 qualquer um. Quem fecha o cadastro e a chave do painel, so ela.
+
+## 8. ~~A plataforma nao estava no ar~~ — PUBLICADA em 2026-11-01
+
+<https://fabianosannino.github.io/Jogo_Univesp/>
+
+GitHub Pages servindo `main` na raiz. O site e estatico e o repositorio ja era publico,
+entao nao ha build, nao ha servidor e nao ha custo. A escola abre o endereco no
+navegador; so o jogo da Olivia e instalado.
+
+Tres coisas tiveram de mudar para o site funcionar hospedado:
+
+**`index.html` — arquivo novo.** A raiz de um site sem `index.html` devolve 404: o site
+publicado nao teria entrada nenhuma. A porta pergunta quem esta no computador e manda a
+crianca para `principal.html` e o professor para `login.html`. Duas portas, e nao um
+redirecionamento para o login, porque mandar a crianca para a tela de login seria pedir
+que ela digitasse algo — e a decisao de projeto e que ela nunca digita. O arquivo reusa
+as classes do Pedro (`.container`, `.login`) e nao toca o `style.css`; o estilo novo
+esta em `css/plataforma.css` (`.porta*`).
+
+**`login.html` e `cadastro.html` — um caractere cada, e nao foi aditivo.** Os dois
+linkavam `/cadastro.html` e `/login.html`. A barra inicial aponta para a raiz do
+DOMINIO, e o site vive em `fabianosannino.github.io/Jogo_Univesp/`: os dois links davam
+404 e o professor nao conseguia ir do login para o cadastro nem voltar. Nao existe
+conserto externo para um `href` absoluto, e a alternativa era publicar com a navegacao
+quebrada. Avisado ao Pedro.
+
+**O que foi conferido no navegador, no site publicado:** a porta de entrada desenha
+certo; `principal.html` mostra o aviso de maquina nao preparada e o botao "Baixar o
+jogo" com a URL correta do Release; `login.html` carrega sem erro no console e o link
+"Criar uma conta" agora e relativo; `professor.html` sem sessao redireciona para o
+login — a trava de acesso funciona hospedada.
+
+**Uma pegadinha operacional que vale saber:** a turma ativa fica gravada no navegador,
+separada por endereco. A turma marcada no `localhost` NAO vale no site publicado. Em
+cada computador da escola, o professor precisa entrar no site publicado e clicar em
+"Usar esta turma" uma vez.
+
+**O autocadastro continua aberto** (item 7), por decisao explicita do dono do projeto.
+O risco e limitado e vale registrar por que: a RLS isola por professor, entao um
+estranho que se cadastre cai numa tela **vazia** — nao ve turma, aluno nem progresso de
+ninguem. O que sobra e conta de spam e consumo da cota de e-mail do Supabase.
