@@ -412,3 +412,42 @@ Depois disso as tres autenticam de fato (verificado por
 
 Quem criar conta nova no painel: **marcar "Auto Confirm User"**, ou rodar o `update`
 acima.
+
+## 10. O projeto Supabase PAUSA depois de 7 dias sem acesso
+
+Risco aberto, e o unico que pode fazer a plataforma parecer quebrada sem ninguem ter
+mexido em nada.
+
+**Custo dos dois servicos hoje: zero.** Conferido em 2026-11-01:
+
+| Servico | Plano | Limite | Uso |
+|---|---|---|---|
+| GitHub Pages | gratuito (repo **publico**) | 1 GB de site, 100 GB/mes de trafego | 0,5 MB |
+| Supabase | `free` / `tier_free` | 500 MB de banco, 50.000 usuarios/mes | 11 MB, 6 contas |
+
+Se o repositorio virar privado, o Pages passa a exigir plano pago. Fica publico.
+
+**A pegadinha:** no plano gratuito do Supabase, **7 dias sem nenhum acesso pausam o
+projeto**. O efeito e cruel porque e parcial: o site continua abrindo (a porta de entrada
+e HTML estatico e nao depende de nada), mas o login falha e nenhuma turma carrega. Quem
+chegar primeiro vai achar que o produto quebrou, quando o projeto so esta dormindo.
+
+Religar e um clique no painel e leva alguns minutos — o dado nao se perde. O problema e
+**quem descobre primeiro ser o avaliador**, nao a equipe.
+
+**Como evitar, do mais simples ao mais robusto:**
+
+1. Entrar no site publicado uma vez a cada poucos dias. Qualquer login conta como
+   atividade e zera o relogio. Feito em 2026-11-01 (login de `prof1` + leitura de
+   `GET /rest/v1/turma`, ambos OK).
+2. Pedir ao grupo que teste dentro da semana. Duas ou tres pessoas entrando resolve
+   sozinho.
+3. Monitoramento automatico batendo no banco de tempos em tempos. **Descartado por
+   agora:** e mais peca para manter do que o problema justifica enquanto o uso real nao
+   comecou.
+
+**Quando isso vira custo de verdade:** o pause de 7 dias e inaceitavel em sala de aula.
+Sair dele e o plano pago do Supabase, US$ 25/mes por organizacao — e o primeiro custo
+que o projeto teria, e aparece por **confiabilidade**, nao por volume: os 500 MB
+aguentariam muitas escolas. O GitHub Pages seguiria gratuito. Essa conversa e com a
+coordenacao da escola, nao com a equipe.
