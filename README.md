@@ -110,6 +110,8 @@ js/fila.js          fila de marcações quando a internet cai
 sql/schema.sql      tabelas
 sql/politicas.sql   isolamento por professor (RLS)
 docs/PENDENCIAS.md  histórico das decisões e do que falta — leia antes de mudar algo
+docs/especificacao-perfil-login-progresso.md   o que o produto tem de fazer, e por quê
+docs/plano-perfil-login-progresso.md           como foi construído, etapa por etapa
 ```
 
 A chave que está no `js/config.js` é a **pública** (anon), e pode ficar no repositório:

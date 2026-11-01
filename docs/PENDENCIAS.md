@@ -181,7 +181,7 @@ frente. Usei `--ff-only` de proposito: se `main` tivesse andado, o comando teria
 em vez de inventar um merge que ninguem revisou.
 
 Conferido antes de empurrar: nenhum arquivo de credencial rastreado (`.env.teste` e
-`.superpowers/` ficaram de fora, como o `.gitignore` manda) e os 70 testes passando ja
+`.rascunho/` ficaram de fora, como o `.gitignore` manda) e os 70 testes passando ja
 dentro de `main`, nao so na branch.
 
 A branch `perfil-login-progresso` continua existindo, local e remota, apontando para o

@@ -184,7 +184,7 @@ Jogo_Univesp/
 │   └── relatorio.js              leitura consolidada para o professor
 ├── sql/
 │   └── schema.sql                tabelas e políticas, versionado
-└── docs/superpowers/specs/       este documento
+└── docs/                        este documento
 ```
 
 ### Alterações nos arquivos do Pedro

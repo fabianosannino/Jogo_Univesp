@@ -1,6 +1,6 @@
 # Perfil, Login e Progresso — Plano de Implementação
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> As etapas usam caixas de marcação (`- [ ]`) para acompanhar o que já foi feito.
 
 **Goal:** O professor cria turmas, alunos e atividades, marca o que cada aluno concluiu, e o aluno vê o próprio progresso clicando no seu avatar.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** HTML/CSS/JS sem framework · módulos ES nativos · Supabase JS v2 via `cdn.jsdelivr.net` · Postgres com Row Level Security · `node --test` (embutido no Node 24, zero dependências)
 
-**Spec:** `docs/superpowers/specs/2026-10-31-perfil-login-progresso-design.md`
+**Spec:** `docs/especificacao-perfil-login-progresso.md`
 
 ## Global Constraints
 
