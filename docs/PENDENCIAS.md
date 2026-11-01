@@ -298,8 +298,14 @@ criada e sessao na mesma chamada, sem e-mail, sem cota para estourar. A conta de
 da verificacao foi apagada; `auth.users` tem so as duas de teste e a do professor.
 `js/auth.js:23` ja tratava os dois casos e nao mudou.
 
-**`disable_signup` esta `false`: qualquer pessoa na internet pode criar conta de
-professor.** Nao e vazamento de dados — a RLS esta provada, cada conta so alcanca as
+**~~`disable_signup` esta `false`~~ — FECHADO, confirmado em 2026-11-01.**
+`GET /auth/v1/settings` devolve `disable_signup: true`. A partir daqui, conta nova so
+pela equipe: `Authentication` -> `Users` -> `Add user`, com **Auto Confirm User**
+marcado (a confirmacao por e-mail esta desligada e a plataforma nao tem tela de
+confirmacao; sem marcar, a conta nasce sem poder entrar). O texto abaixo descreve o
+estado anterior e fica como registro do porque.
+
+Qualquer pessoa na internet podia criar conta de professor. Nao e vazamento de dados — a RLS esta provada, cada conta so alcanca as
 proprias turmas —, mas numa escola de verdade o normal e a equipe criar as contas, nao
 haver autocadastro aberto. Se desligarem, `js/mensagens.js` ja traduz o erro que a pagina
 passa a dar ("O cadastro esta fechado. Peca para a equipe criar a sua conta.").
@@ -354,7 +360,14 @@ separada por endereco. A turma marcada no `localhost` NAO vale no site publicado
 cada computador da escola, o professor precisa entrar no site publicado e clicar em
 "Usar esta turma" uma vez.
 
-**O autocadastro continua aberto** (item 7), por decisao explicita do dono do projeto.
-O risco e limitado e vale registrar por que: a RLS isola por professor, entao um
-estranho que se cadastre cai numa tela **vazia** — nao ve turma, aluno nem progresso de
-ninguem. O que sobra e conta de spam e consumo da cota de e-mail do Supabase.
+**O autocadastro foi fechado** (item 7), confirmado em 2026-11-01 por
+`GET /auth/v1/settings` (`disable_signup: true`). O site ficou no ar por algumas horas
+com ele aberto, por decisao explicita do dono do projeto, e o risco era limitado: a RLS
+isola por professor, entao um estranho que se cadastrasse caia numa tela **vazia**. Nao
+havia como ver turma, aluno ou progresso de ninguem.
+
+Consequencia pratica de estar fechado: **`cadastro.html` agora da erro**, e isso e o
+comportamento correto. `js/mensagens.js` ja traduz esse erro para "O cadastro esta
+fechado. Peca para a equipe criar a sua conta." O link "Criar uma conta" no
+`login.html` continua visivel e leva a uma pagina que recusa — e do Pedro, e nao e
+aditivo tirar; fica como ponto para ele.
