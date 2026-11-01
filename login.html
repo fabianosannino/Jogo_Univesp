@@ -31,7 +31,11 @@
 
           <button type="submit" class="login">Login</button>
             <div class="register-link">
-                <p> Não possui cadastro? <a href="/cadastro.html"> Criar uma conta</a></p>
+                <!-- Sem a barra inicial: o site hospedado fica em
+                     fabianosannino.github.io/Jogo_Univesp/, e "/cadastro.html"
+                     aponta para a raiz do dominio (erro 404). Caminho relativo
+                     funciona nos dois lugares, local e publicado. -->
+                <p> Não possui cadastro? <a href="cadastro.html"> Criar uma conta</a></p>
             </div>
         </form>
 

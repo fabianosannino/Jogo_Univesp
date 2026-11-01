@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma Educativa para Pessoas com Deficiências Intelectuais</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/plataforma.css">
+</head>
+<!-- Porta de entrada do site hospedado. Ela existe porque um endereco como
+     fabianosannino.github.io/Jogo_Univesp/ abre a raiz, e sem index.html a
+     raiz devolve erro 404 -- o site publicado nao teria entrada nenhuma.
+
+     Duas portas e nao uma: quem abre este endereco e ou o professor, que quer
+     entrar na conta dele, ou a crianca na maquina da escola, que quer ver o
+     proprio progresso. Mandar a crianca para a tela de login seria pedir que
+     ela digitasse algo, e a decisao de projeto e que ela nunca digita.
+
+     Arquivo novo, nao alteracao do layout do Pedro: reusa as classes dele
+     (.container, .login) para ficar igual ao resto, sem tocar no style.css. -->
+<body class="stars">
+    <main class="container porta">
+        <h1>Bem-vindo</h1>
+
+        <p class="porta-texto">Quem está usando o computador agora?</p>
+
+        <a class="login porta-botao" href="principal.html">
+            Sou aluno — ver meu progresso
+        </a>
+
+        <a class="login porta-botao" href="login.html">
+            Sou professor — entrar na minha conta
+        </a>
+
+        <p class="porta-rodape">
+            Projeto Integrador — UNIVESP
+        </p>
+    </main>
+</body>
+</html>

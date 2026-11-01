@@ -171,3 +171,25 @@
   height: calc(100vh - 140px);   /* desconta o <h1> do Pedro */
   box-sizing: border-box;
 }
+
+/* --- porta de entrada (index.html) --- */
+
+/* O .stars::before do style.css e position:fixed e cobre a tela inteira com a
+   animacao. Sem z-index proprio, a porta fica desenhada DEBAIXO dela e o
+   visitante ve so a animacao -- foi exatamente o que aconteceu com o painel
+   do professor antes do mesmo conserto. */
+.porta { position: relative; z-index: 1; text-align: center; }
+
+.porta-texto { font-size: 1.15rem; margin: 8px 0 4px; }
+
+/* O .login do Pedro foi escrito para <button>, nao para <a>: como link ele
+   perde a centralizacao do texto e a altura. display:flex devolve as duas,
+   sem alterar a regra dele. */
+.porta-botao {
+  display: flex; align-items: center; justify-content: center;
+  margin: 18px auto; text-decoration: none; text-align: center;
+  padding: 0 16px; box-sizing: border-box;
+}
+.porta-botao:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+
+.porta-rodape { font-size: .9rem; opacity: .85; margin-top: 8px; }
