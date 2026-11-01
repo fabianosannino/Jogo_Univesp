@@ -371,3 +371,44 @@ comportamento correto. `js/mensagens.js` ja traduz esse erro para "O cadastro es
 fechado. Peca para a equipe criar a sua conta." O link "Criar uma conta" no
 `login.html` continua visivel e leva a uma pagina que recusa — e do Pedro, e nao e
 aditivo tirar; fica como ponto para ele.
+
+## 9. Tres contas de demonstracao — CRIADAS em 2026-11-01
+
+Com o autocadastro fechado, cada avaliador precisa de uma conta pronta. Sao tres, uma
+por pessoa, com a mesma senha `Demo2026!univesp`:
+
+| Conta | Turma que ela ve |
+|---|---|
+| `prof1.teste@example.com` | Turma Girassol - 3o ano (5 alunos, 4 atividades) |
+| `prof2.teste@example.com` | Turma Arco-Iris - 4o ano (4 alunos, 5 atividades) |
+| `prof3.teste@example.com` | Turma Jabuticaba - 2o ano (6 alunos, 3 atividades) |
+
+**Por que tres e nao uma compartilhada:** uma conta compartilhada tem um botao "Apagar
+turma" compartilhado. O primeiro avaliador que confirmar esse botao esvazia a tela de
+todos os que vierem depois. Com tres contas, cada um pode apagar o que quiser sem
+estragar o teste do outro — e isso de quebra demonstra a RLS funcionando.
+
+**O dominio e `@example.com` de proposito:** e reservado pela IANA e nunca pode
+pertencer a uma pessoa real. Um `.com.br` inventado poderia.
+
+**Regra que essas contas carregam:** dado real de escola nunca pode morar numa conta
+cuja senha esta publicada. Quando o projeto for usado de verdade, cada professora
+recebe conta propria e estas tres sao apagadas.
+
+**A pegadinha do "Auto Confirm User" aconteceu de verdade.** `prof1` e `prof3` foram
+criadas no painel sem marcar essa opcao, nasceram com `email_confirmed_at` nulo e
+**nao conseguiam entrar** — a plataforma nao tem tela de confirmacao de e-mail, entao
+nao havia caminho nenhum. Corrigido com:
+
+```sql
+update auth.users set email_confirmed_at = now()
+ where email in ('prof1.teste@example.com','prof3.teste@example.com')
+   and email_confirmed_at is null;
+```
+
+Depois disso as tres autenticam de fato (verificado por
+`POST /auth/v1/token?grant_type=password`), e cada token so devolve a propria turma em
+`GET /rest/v1/turma` — a isolacao por professor conferida ao vivo, nao so no teste.
+
+Quem criar conta nova no painel: **marcar "Auto Confirm User"**, ou rodar o `update`
+acima.
