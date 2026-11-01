@@ -7,7 +7,7 @@ e chave de painel, nao linha de codigo, e so quem entra no painel do Supabase po
 O item 4 fechou com uma ressalva que vale ler: a build publicada parece ser um
 Development Build, e isso so se resolve recompilando no Unity.
 
-Os 71 testes automatizados passam, e isso diz menos do que parece: eles provam que a
+Os 80 testes automatizados passam, e isso diz menos do que parece: eles provam que a
 logica de interface e de dados esta correta **isoladamente**. Nenhum deles toca o banco.
 Quem toca o banco sao os dois testes do item 2 — e esses agora rodaram.
 
@@ -112,7 +112,7 @@ O jogo esta no ar:
 `URL_DOWNLOAD_JOGO` em `js/config.js` aponta para o arquivo, e o botao "Baixar o jogo"
 aparece em todas as telas da crianca. O teste que afirmava o contrario foi invertido:
 agora `tests/render.test.js` exige o botao nas cinco telas e exige que a URL seja
-`https`. Sao 71 testes passando.
+`https`.
 
 O arquivo e um asset de Release, nao um arquivo do repositorio: asset de Release nao tem
 o limite de 100 MB por arquivo, e o GitHub o serve sem pedir conta. O professor clica e
@@ -189,23 +189,93 @@ mesmo commit. Apagar e decisao de quem coordena.
 git checkout main && git merge --ff-only perfil-login-progresso && git push origin main
 ```
 
-## 6. Debito conhecido, deliberadamente adiado
+## 6. Debito conhecido — tres resolvidos em 2026-10-31, dois dependem do Pedro
 
-- `principal.html` ainda tem residuo de mockup do Pedro: `<h1 ...>a</h1>` e
-  `<h1>O jogo vai aqui!</h1>`. Nao mexi porque e arquivo de colega; a unica alteracao
-  nao-aditiva autorizada foi `lang="en"` -> `lang="pt-BR"`, por acessibilidade.
-- `perfil.html` esta orfao e mostra os textos literais "Nome" e "Email".
-- `listarTurmas()` nao filtra por `professor`: quem garante o isolamento e a RLS, e isso
-  **esta provado** desde que o teste do item 2 passou. Continua sendo defesa em uma unica
-  camada: se alguem errar uma politica no futuro, a aplicacao nao segura nada por conta
-  propria. Adicionar `.eq('professor', id)` seria cinto e suspensorio.
-- Duas abas de `professor.html` abertas na mesma maquina sobrescrevem a fila offline uma
-  da outra.
-- Redesenhar `#caixa-avatar` devolve o `<select>` para um avatar ja em uso; o rotulo
-  "(em uso)" avisa, mas nao impede. **Visto no navegador em 2026-10-31**: depois de
-  cadastrar a Ana com a coruja, o campo voltou sozinho para "🦉 Coruja (em uso)". Numa
-  turma de doze, os doze primeiros avatares ficam marcados "(em uso)" e o campo continua
-  parando no primeiro deles — o professor tem de mexer no campo toda vez.
+### ~~O campo de avatar voltava para um bichinho em uso~~ — RESOLVIDO
+
+Era o que mais incomodava na pratica: a tela redesenha o campo depois de cada cadastro, e
+ele voltava para o primeiro da lista, que normalmente ja estava tomado. Numa turma de doze
+o professor corrigia o campo doze vezes. **Visto no navegador**: depois de cadastrar a Ana
+com a coruja, o campo voltou sozinho para "🦉 Coruja (em uso)".
+
+`renderSeletorAvatar` agora abre no primeiro bichinho **livre** e marca os tomados como
+`disabled` — o rotulo "(em uso)" passou a impedir, nao so avisar. O plano ja dizia por que
+isso importa: "dois alunos ficam indistinguiveis na tela — que e exatamente o erro que a
+crianca comete sozinha". Para a crianca que nao le, o bichinho **e** o nome dela.
+
+Com uma excecao que vale registrar: se os 30 avatares estiverem tomados, nada e bloqueado.
+Sao turmas de 20 a 30 alunos, entao a turma que chega no 31o existe, e bloquear tudo ali
+deixaria o professor **sem conseguir cadastrar a crianca**. Repetir o bichinho e ruim; nao
+cadastrar o aluno e pior. Quatro testes cobrem os quatro casos, inclusive esse.
+
+Nao criei `unique (turma_id, avatar)` no banco justamente por isso: a restricao barraria o
+31o aluno de uma turma grande, e o avatar nao protege nada (a spec diz que a escolha "e
+apenas visual — nao autentica nada").
+
+### ~~Duas abas sobrescreviam a fila offline uma da outra~~ — RESOLVIDO
+
+O professor deixa a plataforma aberta numa aba e abre outra: as duas usam o mesmo
+`localStorage` com a mesma chave, cada uma com sua copia da fila em memoria. Cada uma
+gravava a copia inteira por cima, e a ultima a gravar **apagava as marcacoes da outra, em
+silencio**. Perder marcacao de aluno e a falha que faz a escola abandonar a ferramenta
+(spec D6).
+
+A fila agora guarda o conjunto de celulas que **aquela aba** tocou. Na hora de gravar: a
+celula que a aba tocou, ela manda (ela sabe se esta pendente, enviada ou anulada); a celula
+que ela nunca viu veio da outra aba e e preservada como esta no disco.
+
+Por que nao foi so unir as duas listas: unir ressuscitaria o que a aba acabou de enviar com
+sucesso, e o progresso do aluno iria duas vezes. Ha um teste exatamente para isso.
+
+Se as duas abas tocarem a **mesma** celula, a ultima a gravar vence. Nao da para resolver
+sem relogio confiavel, e sendo a mesma celula a intencao do professor e ambigua de todo
+modo.
+
+### ~~`listarTurmas()` nao filtrava por professor~~ — RESOLVIDO
+
+Agora filtra: `.eq('professor', idProfessor)`. Quem de fato impede um professor de ler a
+turma do outro continua sendo a RLS do banco, e isso **esta provado** desde que o teste do
+item 2 passou. O filtro na aplicacao e a segunda camada, porque politica de RLS errada
+falha em silencio — ela simplesmente para de filtrar e nada avisa.
+
+Sem o id, a funcao **recusa** em vez de consultar. Esse e o ponto: uma consulta sem filtro
+nao daria erro na tela, daria uma lista com a turma de outro professor dentro.
+
+### Residuo de maquete no `principal.html` — depende do Pedro
+
+`principal.html` e a tela que a crianca usa, e tem duas sobras de maquete:
+
+- `<h1 style="color: white">a</h1>` na coluna da esquerda. **Feito o que era possivel**:
+  ganhou `aria-hidden="true"`, que e aditivo. Sem isso, um leitor de tela anunciava
+  "titulo de nivel 1, a" antes de qualquer coisa util. O desenho da tela nao mudou.
+- `<h1>O jogo vai aqui!</h1>`, que a crianca **le**. Esconder nao resolve e trocar o texto
+  nao e mudanca aditiva. Alem disso a altura dele esta embutida no
+  `calc(100vh - 140px)` do `#raiz-aluno` em `css/plataforma.css`: mexer no `<h1>` sem
+  olhar o resultado no navegador arrisca cortar a lista de alunos, que e defeito pior do
+  que texto estranho.
+
+A regra do time e que arquivo de colega so recebe mudanca aditiva. Trocar esse texto
+precisa do Pedro, ou do aval dele.
+
+### `perfil.html` orfao — recomendo apagar, com o aval do Pedro
+
+**Nada no site aponta para `perfil.html`** (verificado por busca em todo o HTML, JS e CSS).
+Ele mostra os textos literais "Nome", "Email" e "Progresso", e tem um campo de **escolher
+foto de perfil**, com o `script.js` ligado nele e funcionando.
+
+O que a foto faz de fato: `script.js` le o arquivo com `FileReader` e mostra na propria
+tela. **Nada e enviado nem gravado** — e so previa no navegador. Entao nao ha coleta de
+dado nenhuma, e nao ha violacao de LGPD acontecendo.
+
+O problema e outro: a documentacao deste projeto afirma que nao se armazena foto de aluno
+(LGPD Art. 14), e existe no site uma pagina que convida a escolher uma. Pagina orfa nao
+deixa de ser pagina: qualquer pessoa digita `/perfil.html` e chega nela. Num Projeto
+Integrador que vai ser avaliado, e uma contradicao visivel.
+
+Recomendacao: apagar `perfil.html` e o `script.js` (que existe so por causa dela). Como
+nada aponta para os dois, apagar nao quebra nada — e e reversivel pelo git. Mas e arquivo
+do Pedro e a regra e nao alterar produto de colega, entao fica para ele ou para o aval
+dele. Nao apaguei.
 
 ## 7. Duas decisoes de configuracao da autenticacao (do time, nao do codigo)
 

@@ -25,9 +25,24 @@ export function criarDb(cliente) {
   return {
     // --- turma ---
 
-    listarTurmas() {
+    // O `.eq('professor', ...)` e a segunda camada, nao a primeira: quem
+    // impede um professor de ler a turma do outro e a RLS do banco (provada
+    // por sql/politicas.sql e pelo teste de integracao). O filtro aqui existe
+    // porque politica de RLS errada falha em silencio -- ela para de filtrar e
+    // nada avisa. Com as duas camadas, seria preciso errar nos dois lugares.
+    //
+    // Sem id, recusa em vez de consultar. Uma consulta sem filtro nao daria
+    // erro: daria uma lista com a turma de outro professor dentro.
+    listarTurmas(idProfessor) {
+      if (!idProfessor) {
+        return Promise.reject(new Error('listarTurmas exige o id do professor'));
+      }
       return pegar(
-        cliente.from('turma').select('id, nome, criada_em').order('nome'),
+        cliente
+          .from('turma')
+          .select('id, nome, criada_em')
+          .eq('professor', idProfessor)
+          .order('nome'),
         []
       );
     },

@@ -6,8 +6,9 @@ import {
   renderAvataresDaTurma,
   renderProgressoDoAluno,
   renderAreaAluno,
+  renderSeletorAvatar,
 } from '../js/render.js';
-import { URL_DOWNLOAD_JOGO } from '../js/config.js';
+import { URL_DOWNLOAD_JOGO, AVATARES } from '../js/config.js';
 import { montarGrade, montarLinhaDoAluno } from '../js/grade.js';
 
 const ALUNOS = [
@@ -92,6 +93,68 @@ test('seletor de avatar tem um botao grande por aluno', () => {
   assert.ok(html.includes('data-aluno="a2"'));
   assert.ok(html.includes('\u{1F989}'), 'falta o emoji da coruja');
   assert.ok(html.includes('Ana'), 'o nome acompanha o avatar');
+});
+
+// --- o campo de avatar do formulario de cadastro ---
+//
+// Contexto do bug, visto no navegador em 2026-10-31: depois de cadastrar a Ana
+// com a coruja, a tela redesenha o campo e ele volta para "Coruja (em uso)".
+// Numa turma de doze o professor repete isso doze vezes, e na pressa cadastra
+// dois alunos com o mesmo bichinho. O plano ja dizia por que isso importa:
+// "dois alunos ficam indistinguiveis na tela -- que e exatamente o erro que a
+// crianca comete sozinha". Para a crianca que nao le, o bichinho E o nome dela.
+
+function opcoesDe(html) {
+  return html.match(/<option[^>]*>/g) ?? [];
+}
+
+test('o campo de avatar ja vem no primeiro bichinho livre', () => {
+  // Coruja e raposa sao os dois primeiros da lista, e estao tomados.
+  const html = renderSeletorAvatar(['coruja', 'raposa']);
+  const selecionadas = opcoesDe(html).filter((o) => o.includes('selected'));
+
+  assert.equal(selecionadas.length, 1, 'exatamente uma opcao pre-selecionada');
+  assert.ok(
+    selecionadas[0].includes(`value="${AVATARES[2].id}"`),
+    `esperava ${AVATARES[2].id}, o terceiro da lista; veio ${selecionadas[0]}`
+  );
+});
+
+test('sem ninguem cadastrado, o campo vem no primeiro da lista', () => {
+  const selecionadas = opcoesDe(renderSeletorAvatar([])).filter((o) => o.includes('selected'));
+  assert.equal(selecionadas.length, 1);
+  assert.ok(selecionadas[0].includes(`value="${AVATARES[0].id}"`));
+});
+
+test('bichinho em uso nao da para escolher, nao so avisa', () => {
+  const html = renderSeletorAvatar(['coruja']);
+  const opcoes = opcoesDe(html);
+
+  const coruja = opcoes.find((o) => o.includes('value="coruja"'));
+  assert.ok(coruja.includes('disabled'), 'a coruja ja e da Ana: o campo tem de barrar');
+
+  const livres = opcoes.filter((o) => !o.includes('value="coruja"'));
+  for (const o of livres) {
+    assert.ok(!o.includes('disabled'), `bichinho livre bloqueado: ${o}`);
+  }
+});
+
+// Sao 30 avatares e o plano fala de turmas de 20 a 30 alunos: a turma que
+// chega no 31o aluno existe. Se o campo bloqueasse tudo, o professor
+// simplesmente nao conseguiria cadastrar essa crianca -- seria trocar um
+// incomodo por uma parede. Quando nao sobra bichinho, o campo libera a
+// repeticao e o rotulo "(em uso)" volta a ser o que era: um aviso.
+test('turma que esgotou os bichinhos ainda deixa cadastrar', () => {
+  const html = renderSeletorAvatar(AVATARES.map((a) => a.id));
+  const opcoes = opcoesDe(html);
+
+  assert.ok(!html.includes('disabled'), 'nada bloqueado quando nao sobra escolha');
+  assert.equal(
+    opcoes.filter((o) => o.includes('selected')).length,
+    1,
+    'o campo nao pode ficar vazio: tem de dar para enviar o formulario'
+  );
+  assert.ok(html.includes('(em uso)'), 'o aviso continua visivel');
 });
 
 test('avatar desconhecido nao quebra o seletor', () => {

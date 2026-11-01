@@ -38,6 +38,13 @@ function aplicarItem(lista, item) {
   return lista;
 }
 
+// Identidade de uma celula da grade. O \u0000 separa os dois ids porque nunca
+// aparece dentro de um uuid: evita que 'ab' + 'c' colida com 'a' + 'bc'.
+// E a mesma convencao que js/professor.js usa para as celulas em voo.
+function chaveDaCelula(item) {
+  return `${item.aluno_id}\u0000${item.atividade_id}`;
+}
+
 // O proprio acesso a window.localStorage pode lancar (Firefox com
 // resistFingerprinting, cookie bloqueado). Recebe uma FUNCAO em vez do objeto
 // porque e o acesso que lanca -- e isso torna a funcao testavel no Node, que
@@ -59,6 +66,25 @@ export function criarFila(armazenamento, chave = 'fila_progresso') {
   // sobrevive ao recarregar a pagina. Se ele falhar, a fila continua.
   let itens = carregar();
 
+  // Celulas que ESTA aba ja tocou -- enfileirou, enviou ou anulou. So cresce.
+  //
+  // Serve para gravar sem atropelar outra aba. O professor deixa a plataforma
+  // aberta numa aba e abre outra: as duas usam o mesmo localStorage com a mesma
+  // chave, cada uma com sua copia em memoria. Gravando a copia inteira, a
+  // ultima a gravar apagava as marcacoes da outra, em silencio.
+  //
+  // Com este conjunto, a regra de gravacao fica: celula que esta aba tocou, ela
+  // manda (ela sabe se esta pendente, se foi enviada ou se foi anulada); celula
+  // que ela nunca viu veio da outra aba e e preservada como esta no disco.
+  //
+  // Por que nao simplesmente unir as duas listas: unir ressuscitaria o que esta
+  // aba acabou de enviar com sucesso, e o progresso do aluno iria duas vezes.
+  //
+  // Se as duas abas tocarem a MESMA celula, a ultima a gravar vence. Nao ha o
+  // que fazer sem relogio confiavel, e e a mesma celula: a intencao do
+  // professor e ambigua de qualquer modo.
+  const tocadas = new Set(itens.map(chaveDaCelula));
+
   function carregar() {
     let bruto;
     try {
@@ -79,8 +105,11 @@ export function criarFila(armazenamento, chave = 'fila_progresso') {
   }
 
   function gravar() {
+    // Le o disco de novo na hora de gravar: entre a ultima leitura e agora,
+    // a outra aba pode ter enfileirado algo.
+    const alheias = carregar().filter((i) => !tocadas.has(chaveDaCelula(i)));
     try {
-      armazenamento.setItem(chave, JSON.stringify(itens));
+      armazenamento.setItem(chave, JSON.stringify([...itens, ...alheias]));
     } catch {
       // Sem espaco ou sem permissao. A fila segue em memoria; o professor
       // nao precisa saber. Perde-se apenas se a pagina for recarregada.
@@ -91,6 +120,7 @@ export function criarFila(armazenamento, chave = 'fila_progresso') {
     enfileirar(item) {
       if (!ehItemValido(item)) return;
       aplicarItem(itens, item);
+      tocadas.add(chaveDaCelula(item));
       gravar();
     },
 

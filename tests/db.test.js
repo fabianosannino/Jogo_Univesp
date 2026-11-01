@@ -24,11 +24,38 @@ function clienteFalso(resposta = { data: [], error: null }) {
 
 test('listarTurmas le a tabela turma em ordem de nome', async () => {
   const cliente = clienteFalso({ data: [{ id: 't1', nome: 'Turma A' }], error: null });
-  const turmas = await criarDb(cliente).listarTurmas();
+  const turmas = await criarDb(cliente).listarTurmas('prof-1');
 
   assert.deepEqual(turmas, [{ id: 't1', nome: 'Turma A' }]);
   assert.deepEqual(cliente.chamadas[0], ['from', 'turma']);
   assert.ok(cliente.chamadas.some(([m, c]) => m === 'order' && c === 'nome'));
+});
+
+// Cinto e suspensorio. Quem de fato impede um professor de ver a turma do outro
+// e a Row Level Security do banco, e isso esta provado pelo teste de integracao
+// de sql/politicas.sql. Mas era defesa em uma unica camada: politica de RLS
+// errada falha em silencio -- ela simplesmente para de filtrar -- e a aplicacao
+// nao segurava nada por conta propria.
+test('listarTurmas filtra pelo professor, nao confia so na RLS', async () => {
+  const cliente = clienteFalso({ data: [], error: null });
+  await criarDb(cliente).listarTurmas('prof-1');
+
+  assert.ok(
+    cliente.chamadas.some(([m, c, v]) => m === 'eq' && c === 'professor' && v === 'prof-1'),
+    'faltou o .eq("professor", id) na consulta'
+  );
+});
+
+// O modo de falhar que importa: id vazio virando consulta sem filtro nao da
+// erro na tela -- da uma tela que lista a turma de outro professor como se
+// fosse do dono da sessao. Entre falhar alto e filtrar por nada, falhar alto.
+test('listarTurmas sem id de professor recusa em vez de listar tudo', async () => {
+  const cliente = clienteFalso({ data: [], error: null });
+  const db = criarDb(cliente);
+
+  await assert.rejects(() => db.listarTurmas(), /professor/i);
+  await assert.rejects(() => db.listarTurmas(''), /professor/i);
+  assert.equal(cliente.chamadas.length, 0, 'nao pode nem chegar a consultar o banco');
 });
 
 test('criarTurma grava nome e professor', async () => {
@@ -113,12 +140,12 @@ test('listarProgresso nao deixa a chave da juncao escapar', async () => {
 test('erro do banco virar excecao com mensagem legivel', async () => {
   const cliente = clienteFalso({ data: null, error: { message: 'permission denied' } });
   await assert.rejects(
-    () => criarDb(cliente).listarTurmas(),
+    () => criarDb(cliente).listarTurmas('prof-1'),
     /permission denied/
   );
 });
 
 test('data nulo em listagem devolve lista vazia, nao nulo', async () => {
   const cliente = clienteFalso({ data: null, error: null });
-  assert.deepEqual(await criarDb(cliente).listarTurmas(), []);
+  assert.deepEqual(await criarDb(cliente).listarTurmas('prof-1'), []);
 });

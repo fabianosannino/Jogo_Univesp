@@ -182,3 +182,69 @@ test('armazenamentoSeguro devolve substituto inerte quando o acesso lanca', () =
   fila.enfileirar(ITEM);
   assert.equal(fila.tamanho(), 1, 'a fila sobrevive ao armazenamento bloqueado');
 });
+
+// --- duas abas de professor.html na mesma maquina ---
+//
+// Acontece de verdade: o professor deixa a plataforma aberta numa aba, abre
+// outra para conferir alguma coisa, e as duas passam a usar o mesmo
+// localStorage com a mesma chave. Cada aba tem sua copia da fila em memoria e
+// gravava a copia inteira por cima da do vizinho -- a ultima a gravar apagava
+// as marcacoes da outra, em silencio. Perder marcacao de aluno e a falha que
+// faz a escola abandonar a ferramenta (spec D6).
+
+const CELULA_A = { acao: 'marcar', aluno_id: 'ana', atividade_id: 't1' };
+const CELULA_B = { acao: 'marcar', aluno_id: 'bruno', atividade_id: 't2' };
+
+test('duas abas offline nao apagam as marcacoes uma da outra', () => {
+  const arm = armazenamentoFalso();
+  const aba1 = criarFila(arm);
+  const aba2 = criarFila(arm);
+
+  aba1.enfileirar(CELULA_A);
+  aba2.enfileirar(CELULA_B);   // antes, esta gravacao apagava a da aba1
+
+  // Uma terceira leitura do mesmo armazenamento e o que sobrevive a um
+  // recarregar de pagina: tem de ter as duas marcacoes.
+  const depoisDeRecarregar = criarFila(arm);
+  assert.equal(depoisDeRecarregar.tamanho(), 2, 'as duas marcacoes tem de estar no disco');
+
+  const alunos = depoisDeRecarregar.itens().map((i) => i.aluno_id).sort();
+  assert.deepEqual(alunos, ['ana', 'bruno']);
+});
+
+test('aba que envia com sucesso nao ressuscita o proprio item', async () => {
+  const arm = armazenamentoFalso();
+  const aba1 = criarFila(arm);
+  const aba2 = criarFila(arm);
+
+  aba1.enfileirar(CELULA_A);
+  aba2.enfileirar(CELULA_B);
+
+  // A aba1 volta a ter internet e envia o que era dela.
+  const r = await aba1.drenar(async () => {});
+  assert.equal(r.enviados, 1, 'a aba1 so tem o item dela para enviar');
+
+  // O que sobra no disco e so o item da aba2. Se o item da aba1 voltasse,
+  // o progresso da Ana seria enviado duas vezes.
+  const depoisDeRecarregar = criarFila(arm);
+  assert.deepEqual(depoisDeRecarregar.itens(), [CELULA_B]);
+});
+
+test('uma aba nao reabre o que a outra ja cancelou', () => {
+  const arm = armazenamentoFalso();
+  const aba1 = criarFila(arm);
+  const aba2 = criarFila(arm);
+
+  aba1.enfileirar(CELULA_A);
+  aba1.enfileirar({ ...CELULA_A, acao: 'desmarcar' });  // professor desfez: anula
+  assert.equal(aba1.tamanho(), 0);
+
+  aba2.enfileirar(CELULA_B);
+
+  const depoisDeRecarregar = criarFila(arm);
+  assert.deepEqual(
+    depoisDeRecarregar.itens(),
+    [CELULA_B],
+    'a celula anulada na aba1 nao pode voltar quando a aba2 grava'
+  );
+});

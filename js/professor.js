@@ -37,8 +37,10 @@ const estado = {
 
 // --- turmas ---
 
+// Chamada sempre DEPOIS de `professor` estar preenchido por exigirProfessor:
+// sem id, listarTurmas recusa em vez de listar a turma de todo mundo.
 async function recarregarTurmas() {
-  estado.turmas = await db.listarTurmas();
+  estado.turmas = await db.listarTurmas(professor.id);
   el('#lista-turmas').innerHTML = renderListaSimples(estado.turmas, 'turma');
 
   // Ruling C27: escaparHtml em value e no texto do option; o replace inline nao

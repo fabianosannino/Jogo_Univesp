@@ -8,8 +8,18 @@
     <link rel="stylesheet" href="css/plataforma.css">
 </head>
 <body class="stars">
-    <aside class="lateral"> 
-        <h1 style="color: white; position: relative;;">a</h1>
+    <!-- O aria-hidden abaixo e aditivo (so um atributo) e resolve um problema
+         de acessibilidade: o conteudo deste <h1> e a letra "a", residuo de
+         maquete, e um leitor de tela anuncia "titulo de nivel 1, a" antes de
+         qualquer coisa util. Escondido da leitura, o desenho da tela fica
+         identico: o elemento continua ocupando a coluna da esquerda, que e
+         para o que ele serve hoje.
+         O <h1>O jogo vai aqui!</h1> logo abaixo tambem e residuo, mas a
+         crianca o LE: esconder nao resolve, trocar o texto nao e aditivo, e
+         a altura dele esta embutida no calc(100vh - 140px) do #raiz-aluno em
+         css/plataforma.css. Fica para o Pedro, ou com o aval dele. -->
+    <aside class="lateral">
+        <h1 style="color: white; position: relative;;" aria-hidden="true">a</h1>
     </aside>
     <main class="game">
         <h1>O jogo vai aqui!</h1>

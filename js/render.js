@@ -92,12 +92,39 @@ export function renderListaSimples(itens, tipo) {
   return `<ul class="lista">${linhas}</ul>`;
 }
 
+// O campo de avatar do formulario de cadastro.
+//
+// Duas coisas que o rotulo "(em uso)" sozinho nao resolvia:
+//
+// 1. O campo abre no primeiro bichinho LIVRE, nao no primeiro da lista. A tela
+//    redesenha este campo depois de cada cadastro; abrindo sempre no primeiro,
+//    ela abria sempre num bichinho ja tomado, e o professor tinha de mexer no
+//    campo doze vezes numa turma de doze.
+// 2. Bichinho tomado vem `disabled`. Para a crianca que nao le, o bichinho e o
+//    nome dela: dois alunos com a mesma coruja ficam indistinguiveis na tela,
+//    que e justamente o engano que a crianca comete sozinha.
+//
+// A excecao importa: se TODOS os bichinhos estiverem tomados, nada e bloqueado.
+// Sao 30 avatares para turmas de 20 a 30 alunos, entao a turma que chega no 31o
+// existe -- e bloquear tudo ali deixaria o professor sem conseguir cadastrar a
+// crianca. Nesse caso o "(em uso)" volta a ser so um aviso, que e o certo:
+// repetir o bichinho e ruim, nao cadastrar o aluno e pior.
 export function renderSeletorAvatar(avataresUsados = []) {
   const usados = new Set(avataresUsados);
+  const livres = AVATARES.filter((a) => !usados.has(a.id));
+  const esgotou = livres.length === 0;
+  const idInicial = esgotou ? AVATARES[0].id : livres[0].id;
+
   const opcoes = AVATARES
     .map((a) => {
-      const marca = usados.has(a.id) ? ' (em uso)' : '';
-      return `<option value="${escaparHtml(a.id)}">${a.emoji} ${escaparHtml(a.rotulo + marca)}</option>`;
+      const emUso = usados.has(a.id);
+      const marca = emUso ? ' (em uso)' : '';
+      const bloqueio = emUso && !esgotou ? ' disabled' : '';
+      const escolhido = a.id === idInicial ? ' selected' : '';
+      return (
+        `<option value="${escaparHtml(a.id)}"${bloqueio}${escolhido}>` +
+        `${a.emoji} ${escaparHtml(a.rotulo + marca)}</option>`
+      );
     })
     .join('');
   return `<select id="avatar-input" aria-label="Avatar do aluno">${opcoes}</select>`;
