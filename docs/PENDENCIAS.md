@@ -522,6 +522,12 @@ dele foram ajustadas, pelas decisoes 1 e 2 acima:
   download. Junto, a crianca deixou de ver mensagem tecnica de erro (spec D7): o
   motivo vai para o console.
 
+**Aval do Pedro em 2026-11-06** para as mudancas do PR #1 nos arquivos dele
+(`perfil.html`, `script.js`, `avatar.jpg` e `Forest-Background.jpg` apagados; `style.css`,
+`principal.html`, `login.html` e `cadastro.html` reescritos), com a condicao de manter
+backup. O backup esta em `backup/layout-pedro-2026-11-06.zip` (os arquivos exatos do
+commit `c7c47c6`), com instrucoes em `backup/LEIA-ME.md`.
+
 ### Defeito corrigido junto: marca do jogo presa na grade
 
 Uma celula que tinha so registro com origem `'jogo'` aparecia como marcada (botao

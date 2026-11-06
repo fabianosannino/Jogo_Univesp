@@ -131,6 +131,7 @@ js/fila.js          fila de marcações quando a internet cai
 jogar.html          jogo online (versão WebGL), com js/jogar.js
 js/ponte-jogo.js    traduz "fase concluída" do jogo em progresso do aluno
 unity/              arquivos que entram no projeto Unity (ver unity/LEIA-ME.md)
+backup/             layout original do Pedro, guardado em .zip (ver backup/LEIA-ME.md)
 sql/schema.sql      tabelas
 sql/politicas.sql   isolamento por professor (RLS)
 docs/PENDENCIAS.md  histórico das decisões e do que falta — leia antes de mudar algo
