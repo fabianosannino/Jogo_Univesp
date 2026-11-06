@@ -1,9 +1,22 @@
 # Plataforma Educativa — Projeto Integrador UNIVESP
 
 Plataforma web educativa e gamificada para crianças e estudantes com deficiência
-intelectual, feita para uso real em escola parceira.
+intelectual. Feita para a avaliação da disciplina e pensada, desde o início, para
+funcionar numa escola de verdade: é isso que explica as decisões descritas abaixo.
 
 **No ar desde 2026-11-01:** <https://fabianosannino.github.io/Jogo_Univesp/>
+· última atualização em 2026-11-06
+
+---
+
+## Estado atual (2026-11-06)
+
+| | |
+|---|---|
+| **Funcionando no site** | tela do aluno (turma → nome → estrelas → baixar o jogo), área do professor com abas, isolamento por professor no banco, fila de marcações quando a internet cai, download do jogo para Windows |
+| **Pronto, esperando a Olívia** | jogo online (WebGL) gravando o progresso sozinho. O lado da plataforma está feito e testado; faltam o projeto Unity, a lista de fases e a build (`unity/LEIA-ME.md`) |
+| **Atenção** | o banco (Supabase gratuito) **pausa depois de 7 dias sem acesso**: o site abre, mas o login não responde. O último acesso foi em 06/11, então alguém precisa entrar no site antes de 13/11 e depois a cada poucos dias (`docs/PENDENCIAS.md`, item 10) |
+| **Prazo** | o projeto é para a avaliação da disciplina, sem uso aberto em produção, e sai do ar no fim de 2026 |
 
 ---
 
@@ -16,8 +29,8 @@ caminhos existem de propósito:
   dela** e clica em **"Baixar o jogo"**, que baixa direto a versão Windows. **Ela não
   digita nada em momento nenhum.** Essa é a decisão central do projeto, não um detalhe de
   interface.
-- **"Sou professor"** — login, e de lá o cadastro de turma, aluno, atividade e
-  progresso.
+- **"Sou professor"** — login, e de lá quatro abas: **Marcar progresso**, **Cadastrar
+  alunos**, **Cadastrar atividades** e **Turmas**.
 
 ### Contas de demonstração
 
@@ -25,28 +38,30 @@ O autocadastro está **fechado** de propósito (ver `docs/PENDENCIAS.md`, item 7
 `cadastro.html` recusa — é o comportamento correto. Para avaliar, use uma das contas
 prontas. **A senha é a mesma nas três: `Demo2026!univesp`**
 
-| Conta | Já tem dentro |
+| Conta | Já tem dentro (conferido em 2026-11-06) |
 |---|---|
-| `prof1.teste@example.com` | Turma Girassol - 3º ano — 5 alunos, 4 atividades |
-| `prof2.teste@example.com` | Turma Arco-Íris - 4º ano — 4 alunos, 5 atividades |
-| `prof3.teste@example.com` | Turma Jabuticaba - 2º ano — 6 alunos, 3 atividades |
+| `prof1.teste@example.com` | Turma Girassol - 3o ano — 6 alunos, 5 atividades, e um registro feito pelo jogo (aparece como 🎮 na grade) |
+| `prof2.teste@example.com` | Turma Arco-Iris - 4o ano — 4 alunos, 5 atividades |
+| `prof3.teste@example.com` | Turma Jabuticaba - 2o ano — 6 alunos, 3 atividades |
+
+Os números mudam conforme as pessoas testam, e é para mudar mesmo.
 
 São três e não uma compartilhada porque a tela tem um botão "Apagar turma": numa conta
 só, o primeiro que confirmasse esse botão esvaziaria a tela de todos os seguintes. Com
 três, **pode apagar e bagunçar à vontade** sem estragar o teste de ninguém.
 
 **Nenhum dado real de escola mora nessas contas, e nunca vai** — senha publicada e dado
-de criança não convivem. Quando o projeto entrar em sala, cada professora recebe conta
-própria e estas três são apagadas.
+de criança não convivem. Se o projeto um dia entrar em sala, cada professora recebe
+conta própria e estas três são apagadas.
 
 ### Roteiro de 5 minutos
 
-1. Entre com uma das contas. Você cai numa turma montada.
-2. Cadastre um aluno e escolha o avatar dele (são 30 bichos).
-3. Cadastre uma atividade.
-4. Marque a atividade como feita para um ou dois alunos.
-5. Volte à entrada e clique em **"Sou aluno"**: é isso que a criança vê — turma,
-   nome, as estrelas dela e o download do jogo.
+1. Entre com uma das contas. Você cai na aba **Marcar progresso** de uma turma montada.
+2. Na aba **Cadastrar alunos**, cadastre um aluno e escolha o bichinho dele (são 30).
+3. Na aba **Cadastrar atividades**, cadastre uma atividade.
+4. Volte a **Marcar progresso** e marque a atividade como feita para um ou dois alunos.
+5. Clique em **"Abrir a tela dos alunos →"**: é isso que a criança vê — turma, nome, as
+   estrelas dela e o download do jogo.
 
 Depois entre numa conta diferente: a turma da anterior **desaparece**. Não é a tela
 escondendo — é o banco recusando, por professor. Mexer no endereço do navegador não
@@ -59,8 +74,13 @@ contorna.
 | Pessoa | Produto | Arquivos |
 |---|---|---|
 | Pedro Henrique dos Santos Alves | Layout | `style.css`, `principal.html`, `login.html`, `cadastro.html` |
-| Olívia de Carvalho | Jogos (Unity) | fora deste repositório |
-| Fabiano S. | Perfis, Login e Progresso | `js/`, `css/plataforma.css`, `sql/`, `tests/`, `professor.html`, `index.html` |
+| Olívia de Carvalho | Jogos (Unity) | fora deste repositório; os arquivos que entram no projeto dela estão em `unity/` |
+| Fabiano S. | Perfis, Login e Progresso | `js/`, `css/plataforma.css`, `sql/`, `tests/`, `professor.html`, `index.html`, `jogar.html` |
+
+A tela do aluno nova, as abas do professor e o visual atual vieram do PR #1
+(`dpereirajuli`, 2026-11-06). Ele reescreveu os arquivos do Pedro e apagou `perfil.html`,
+`script.js` e as duas imagens antigas, **com o aval do Pedro**. Os originais estão
+guardados em `backup/layout-pedro-2026-11-06.zip`.
 
 **Regra seguida neste repositório:** nada é alterado no produto de um colega sem o aval
 dele. As exceções que existem estão todas comentadas no próprio arquivo, explicando por
@@ -122,10 +142,10 @@ trocar isso destruiria o layout do Pedro.
 
 ```
 index.html          porta de entrada (aluno ou professor)
-principal.html      tela do aluno
-professor.html      tela de gestão
+principal.html      tela do aluno, com js/aluno.js (turma → nome → estrelas)
+professor.html      tela de gestão, com js/professor.js e js/abas.js
 login.html          autenticação
-js/config.js        URL do Supabase, chave pública, lista de avatares, link do jogo
+js/config.js        URL do Supabase, chave pública, avatares, links do jogo e fases
 js/db.js            acesso ao banco
 js/fila.js          fila de marcações quando a internet cai
 jogar.html          jogo online (versão WebGL), com js/jogar.js
@@ -149,7 +169,7 @@ entra aqui.
 npm test
 ```
 
-Testes sem dependência externa — só o `node --test`. **As aspas no comando são
+110 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
 obrigatórias** no Git Bash do Windows, senão o shell expande o `*` antes do Node e o
 teste roda vazio.
 
