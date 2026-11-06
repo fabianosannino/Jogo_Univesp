@@ -192,7 +192,7 @@ mesmo commit. Apagar e decisao de quem coordena.
 git checkout main && git merge --ff-only perfil-login-progresso && git push origin main
 ```
 
-## 6. Debito conhecido — tres resolvidos em 2026-10-31, dois dependem do Pedro
+## 6. Debito conhecido — tres resolvidos em 2026-10-31, os dois do Pedro em 2026-11-06
 
 ### ~~O campo de avatar voltava para um bichinho em uso~~ — RESOLVIDO
 
@@ -244,7 +244,7 @@ falha em silencio — ela simplesmente para de filtrar e nada avisa.
 Sem o id, a funcao **recusa** em vez de consultar. Esse e o ponto: uma consulta sem filtro
 nao daria erro na tela, daria uma lista com a turma de outro professor dentro.
 
-### Residuo de maquete no `principal.html` — depende do Pedro
+### ~~Residuo de maquete no `principal.html`~~ — RESOLVIDO pelo PR #1 (tela do aluno nova)
 
 `principal.html` e a tela que a crianca usa, e tem duas sobras de maquete:
 
@@ -260,7 +260,7 @@ nao daria erro na tela, daria uma lista com a turma de outro professor dentro.
 A regra do time e que arquivo de colega so recebe mudanca aditiva. Trocar esse texto
 precisa do Pedro, ou do aval dele.
 
-### `perfil.html` orfao — recomendo apagar, com o aval do Pedro
+### ~~`perfil.html` orfao~~ — APAGADO pelo PR #1, junto com `script.js` e as duas imagens
 
 **Nada no site aponta para `perfil.html`** (verificado por busca em todo o HTML, JS e CSS).
 Ele mostra os textos literais "Nome", "Email" e "Progresso", e tem um campo de **escolher
@@ -507,7 +507,20 @@ invalido no endereco mostra so "chame o professor".
    "Development Build" (item 4).
 
 Depois disso, do lado daqui: copiar a pasta `jogo-web/` para a raiz, preencher as duas
-constantes e, em cada turma, clicar "Incluir as fases do jogo" na area de atividades.
+constantes e, em cada turma, clicar "Incluir as fases do jogo" na aba "Cadastrar
+atividades".
+
+### Mesclado com o PR #1 (tela do aluno nova, abas do professor) em 2026-11-06
+
+O PR #1 entrou neste ramo por merge, sem reescrever o commit do autor. Duas partes
+dele foram ajustadas, pelas decisoes 1 e 2 acima:
+
+- `apenasManual` (`js/grade.js`) escondia da grade tudo que tinha origem `'jogo'`.
+  Saiu: o que o jogo grava aparece como selo, separado do botao da professora.
+- a tela do aluno nao mostrava progresso. Agora o ultimo passo (turma -> nome ->
+  "Oi, Ana!") mostra as estrelas da crianca, o "Jogar online" quando existir, e o
+  download. Junto, a crianca deixou de ver mensagem tecnica de erro (spec D7): o
+  motivo vai para o console.
 
 ### Defeito corrigido junto: marca do jogo presa na grade
 

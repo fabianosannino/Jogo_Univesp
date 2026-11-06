@@ -12,9 +12,10 @@ intelectual, feita para uso real em escola parceira.
 Abra o endereço acima. A tela de entrada pergunta quem está no computador, e os dois
 caminhos existem de propósito:
 
-- **"Sou aluno"** — tela de progresso. A criança escolhe o avatar dela e vê o que já
-  conseguiu. **Ela não digita nada em momento nenhum.** Essa é a decisão central do
-  projeto, não um detalhe de interface.
+- **"Sou aluno"** — a criança escolhe a turma, depois o próprio nome, vê **as estrelas
+  dela** e clica em **"Baixar o jogo"**, que baixa direto a versão Windows. **Ela não
+  digita nada em momento nenhum.** Essa é a decisão central do projeto, não um detalhe de
+  interface.
 - **"Sou professor"** — login, e de lá o cadastro de turma, aluno, atividade e
   progresso.
 
@@ -40,23 +41,16 @@ própria e estas três são apagadas.
 
 ### Roteiro de 5 minutos
 
-1. Entre com uma das contas. Você cai numa turma montada — clique em
-   **"Usar esta turma"**.
+1. Entre com uma das contas. Você cai numa turma montada.
 2. Cadastre um aluno e escolha o avatar dele (são 30 bichos).
 3. Cadastre uma atividade.
 4. Marque a atividade como feita para um ou dois alunos.
-5. Volte à entrada, clique em **"Sou aluno"** e escolha o avatar que você criou. É isso
-   que a criança vê.
+5. Volte à entrada e clique em **"Sou aluno"**: é isso que a criança vê — turma,
+   nome, as estrelas dela e o download do jogo.
 
 Depois entre numa conta diferente: a turma da anterior **desaparece**. Não é a tela
 escondendo — é o banco recusando, por professor. Mexer no endereço do navegador não
 contorna.
-
-### Uma pegadinha de sala de aula
-
-A turma ativa fica gravada **no navegador**, separada por endereço. Em cada computador
-da escola a professora precisa entrar no site e clicar "Usar esta turma" uma vez.
-Depois aquele computador lembra.
 
 ---
 
@@ -64,7 +58,7 @@ Depois aquele computador lembra.
 
 | Pessoa | Produto | Arquivos |
 |---|---|---|
-| Pedro Henrique dos Santos Alves | Layout | `style.css`, `principal.html`, `perfil.html`, `script.js`, `login.html`, `cadastro.html` |
+| Pedro Henrique dos Santos Alves | Layout | `style.css`, `principal.html`, `login.html`, `cadastro.html` |
 | Olívia de Carvalho | Jogos (Unity) | fora deste repositório |
 | Fabiano S. | Perfis, Login e Progresso | `js/`, `css/plataforma.css`, `sql/`, `tests/`, `professor.html`, `index.html` |
 
@@ -111,6 +105,10 @@ Decisões do grupo (2026-11-06) para quando o online existir:
 | Teste rápido | abrir `get.webgl.org/webgl2`: cubo girando = funciona | — |
 | Espaço | o navegador guarda o jogo sozinho | cerca de 200 MB para descompactar |
 
+**Não existe jogo recriado em JavaScript.** Uma recriação chegou a existir (2026-11-03)
+e foi retirada por decisão do projeto. O jogo online é o mesmo projeto Unity da Olívia,
+exportado para WebGL.
+
 Para ver o online funcionando antes da build existir, há um jogo de mentira em
 `tests/jogo-falso/index.html` (as instruções estão no próprio arquivo).
 
@@ -130,7 +128,7 @@ login.html          autenticação
 js/config.js        URL do Supabase, chave pública, lista de avatares, link do jogo
 js/db.js            acesso ao banco
 js/fila.js          fila de marcações quando a internet cai
-jogar.html          jogo no navegador (versão WebGL), com js/jogar.js
+jogar.html          jogo online (versão WebGL), com js/jogar.js
 js/ponte-jogo.js    traduz "fase concluída" do jogo em progresso do aluno
 unity/              arquivos que entram no projeto Unity (ver unity/LEIA-ME.md)
 sql/schema.sql      tabelas
@@ -150,7 +148,7 @@ entra aqui.
 npm test
 ```
 
-109 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
+Testes sem dependência externa — só o `node --test`. **As aspas no comando são
 obrigatórias** no Git Bash do Windows, senão o shell expande o `*` antes do Node e o
 teste roda vazio.
 

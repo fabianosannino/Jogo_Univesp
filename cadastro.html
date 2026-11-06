@@ -3,40 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta - Plataforma Educativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/plataforma.css">
-
-    <title>Cadastro - Plataforma Educativa</title>
 </head>
 <body class="stars">
-    <main class="container">  
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <main class="cartao cartao-form">
+        <a class="voltar-inicio" href="login.html">← Voltar para entrar</a>
 
+        <!-- Os ids sao lidos por js/auth.js: nao renomear.
+             Com o autocadastro fechado no Supabase, enviar este formulario
+             mostra "O cadastro esta fechado..." (js/mensagens.js). -->
         <form id="cadastro-form">
-            <h1>Cadastro</h1>
-            <div class="input-box">   
-                <input id="nome-input" placeholder="Nome" type="text" required>
-            </div>
+            <h1>Criar conta</h1>
+            <p class="sub">Para professores</p>
 
-            <div class="input-box">   
-                <input id="email-input" placeholder="Email" type="email" required>
-            </div>
+            <label class="campo">
+                <span>Nome</span>
+                <input id="nome-input" type="text" autocomplete="name" required>
+            </label>
 
-            <div class="input-box">   
-                <input id="senha-input" placeholder="Senha" type="password" required>
-            </div>
+            <label class="campo">
+                <span>E-mail</span>
+                <input id="email-input" type="email" autocomplete="email" required>
+            </label>
 
-            <div class="input-box">   
-                <input id="senha-confirma-input" placeholder="Confirmar Senha" type="password" required>
-            </div>
+            <label class="campo">
+                <span>Senha</span>
+                <span class="senha-caixa">
+                    <input id="senha-input" type="password" autocomplete="new-password" required minlength="6">
+                    <button type="button" class="mostrar-senha" aria-controls="senha-input">Mostrar</button>
+                </span>
+            </label>
 
-          <button type="submit" class="login">Login</button>
-            <div class="register-link">
-                <!-- Sem a barra inicial: ver a nota em login.html. -->
-                <p> Já possui cadastro? <a href="login.html"> Realizar Login</a></p>
-            </div>
+            <label class="campo">
+                <span>Repita a senha</span>
+                <input id="senha-confirma-input" type="password" autocomplete="new-password" required minlength="6">
+            </label>
+
+            <button type="submit" class="btn btn-largo">Criar conta</button>
+            <p class="nota">Já tem conta? <a href="login.html">Entrar</a></p>
         </form>
-
     </main>
+    <script src="js/senha.js"></script>
     <script type="module" src="js/auth.js"></script>
 </body>
 </html>

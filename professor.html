@@ -3,93 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do professor - Plataforma Educativa</title>
+    <title>Área do professor </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/plataforma.css">
 </head>
+<!-- Todos os ids abaixo sao lidos por js/professor.js: nao renomear.
+     As abas so escondem/mostram secoes (js/abas.js); nenhum dado depende delas. -->
 <body class="stars">
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
     <main class="painel">
         <header class="painel-topo">
             <h1>Área do professor</h1>
-            <p id="identificacao"></p>
-            <button type="button" id="sair">Sair</button>
+            <span id="identificacao"></span>
+            <button type="button" id="sair" class="btn btn-sec">Sair</button>
         </header>
 
-        <!-- Duas caixas, nao uma: a de fila e um estado continuo (role=status,
-             o leitor de tela anuncia sem interromper), a de erro e um
-             acontecimento (role=alert, interrompe). Reaproveitar um <p> so
-             fazia uma mensagem apagar a outra. -->
-        <p id="aviso-fila" class="aviso" hidden role="status"></p>
-        <p id="aviso-erro" class="aviso" hidden role="alert"></p>
+        <div class="turma-barra">
+            <label class="campo">
+                <span>Turma</span>
+                <select id="turma-select"></select>
+            </label>
+            <a class="link-aluno" href="principal.html">Abrir a tela dos alunos →</a>
+        </div>
 
-        <section class="bloco">
-            <h2>Turmas</h2>
-            <form id="form-turma">
-                <label for="turma-nome">Nome da turma</label>
-                <input id="turma-nome" type="text" required maxlength="60">
-                <button type="submit">Criar turma</button>
-            </form>
-            <div id="lista-turmas"></div>
-
-            <label for="turma-select">Turma em uso neste computador</label>
-            <select id="turma-select"></select>
-            <button type="button" id="usar-turma">Usar esta turma aqui</button>
+        <!-- Duas caixas, nao uma: a de fila e um estado continuo (role=status),
+             a de erro e um acontecimento (role=alert). -->
+        <div class="painel-avisos">
             <p id="turma-ativa" class="aviso" hidden role="status"></p>
-            <a class="link-aluno" href="principal.html">Abrir a tela dos alunos</a>
-        </section>
+            <p id="aviso-fila" class="aviso" hidden role="status"></p>
+            <p id="aviso-erro" class="aviso" hidden role="alert"></p>
+        </div>
 
-        <section class="bloco">
-            <h2>Alunos</h2>
-            <form id="form-aluno">
-                <label for="aluno-nome">Primeiro nome</label>
-                <input id="aluno-nome" type="text" required maxlength="40">
-                <label for="avatar-input">Avatar</label>
-                <span id="caixa-avatar"></span>
-                <button type="submit">Adicionar aluno</button>
-            </form>
-            <div id="lista-alunos"></div>
-        </section>
+        <nav class="abas" role="tablist" aria-label="Seções">
+            <button type="button" class="aba" role="tab" id="aba-progresso" aria-controls="painel-progresso" data-aba="progresso">Marcar progresso</button>
+            <button type="button" class="aba" role="tab" id="aba-alunos" aria-controls="painel-alunos" data-aba="alunos">Cadastrar alunos</button>
+            <button type="button" class="aba" role="tab" id="aba-atividades" aria-controls="painel-atividades" data-aba="atividades">Cadastrar atividades</button>
+            <button type="button" class="aba" role="tab" id="aba-turmas" aria-controls="painel-turmas" data-aba="turmas">Turmas</button>
+        </nav>
 
-        <section class="bloco">
-            <h2>Atividades</h2>
-            <form id="form-atividade">
-                <label for="atividade-titulo">Título da atividade</label>
-                <input id="atividade-titulo" type="text" required maxlength="80">
-                <button type="submit">Adicionar atividade</button>
-            </form>
-            <!-- Preenchido so quando o jogo do navegador esta ligado e faltam
-                 fases do jogo nesta turma (js/professor.js). -->
-            <div id="fases-jogo"></div>
-            <div id="lista-atividades"></div>
-        </section>
+        <div class="painel-corpo">
+            <section id="painel-progresso" role="tabpanel" aria-labelledby="aba-progresso">
+                <h2>Marcar progresso</h2>
+                <div id="area-grade"></div>
 
-        <section class="bloco">
-            <h2>Marcar progresso</h2>
-            <div id="area-grade"></div>
+                <!-- So aparece com o jogo online ligado (CAMINHO_JOGO_WEB em
+                     js/config.js); js/professor.js tira o hidden. -->
+                <div id="sobre-jogo-online" class="sobre-jogo" hidden>
+                    <h3>Sobre o jogo online e o offline</h3>
+                    <ul>
+                        <li><strong>Os dois não se comunicam.</strong> O &#x1F3AE; aparece só para
+                            quem joga online, pelo botão "Jogar online". Quem joga a versão baixada
+                            (offline) não gera registro nenhum: marque na grade.</li>
+                        <li><strong>Sem salvar.</strong> Se o computador não estiver preparado,
+                            a criança ainda pode jogar online, mas nada é registrado.</li>
+                        <li><strong>Primeira vez em cada computador:</strong> o jogo online pode levar
+                            alguns minutos para abrir. Depois o navegador guarda e abre rápido.</li>
+                        <li><strong>Para jogar online (recomendado):</strong> Chrome ou Edge
+                            atualizado e 4 GB de memória ou mais. Para saber se o computador
+                            aguenta, abra <code>get.webgl.org/webgl2</code>: se aparecer um cubo
+                            girando, o jogo online funciona.</li>
+                        <li><strong>Para jogar offline:</strong> Windows 10 ou 11 (64 bits) e cerca de
+                            200 MB livres para descompactar o jogo.</li>
+                    </ul>
+                </div>
+            </section>
 
-            <!-- So aparece com o jogo online ligado (CAMINHO_JOGO_WEB em
-                 js/config.js); js/professor.js tira o hidden. -->
-            <div id="sobre-jogo-online" class="sobre-jogo" hidden>
-                <h3>Sobre o jogo online e o offline</h3>
-                <ul>
-                    <li><strong>Os dois não se comunicam.</strong> O &#x1F3AE; aparece só para
-                        quem joga online, pelo botão "Jogar online". Quem joga a versão baixada
-                        (offline) não gera registro nenhum: marque na grade.</li>
-                    <li><strong>Sem salvar.</strong> Se o computador não estiver preparado,
-                        a criança ainda pode jogar online, mas nada é registrado.</li>
-                    <li><strong>Primeira vez em cada computador:</strong> o jogo online pode levar
-                        alguns minutos para abrir. Depois o navegador guarda e abre rápido.</li>
-                    <li><strong>Para jogar online (recomendado):</strong> Chrome ou Edge
-                        atualizado e 4 GB de memória ou mais. Para saber se o computador
-                        aguenta, abra <code>get.webgl.org/webgl2</code>: se aparecer um cubo
-                        girando, o jogo online funciona.</li>
-                    <li><strong>Para jogar offline:</strong> Windows 10 ou 11 (64 bits) e cerca de
-                        200 MB livres para descompactar o jogo.</li>
-                </ul>
-            </div>
-        </section>
+            <section id="painel-alunos" role="tabpanel" aria-labelledby="aba-alunos" hidden>
+                <h2>Alunos da turma</h2>
+                <form id="form-aluno" class="linha-form">
+                    <label class="campo">
+                        <span>Primeiro nome</span>
+                        <input id="aluno-nome" type="text" required maxlength="40">
+                    </label>
+                    <label class="campo campo-curto">
+                        <span>Bichinho</span>
+                        <span id="caixa-avatar"></span>
+                    </label>
+                    <button type="submit" class="btn">Adicionar aluno</button>
+                </form>
+                <div id="lista-alunos"></div>
+            </section>
+
+            <section id="painel-atividades" role="tabpanel" aria-labelledby="aba-atividades" hidden>
+                <h2>Atividades da turma</h2>
+                <form id="form-atividade" class="linha-form">
+                    <label class="campo">
+                        <span>Título da atividade</span>
+                        <input id="atividade-titulo" type="text" required maxlength="80">
+                    </label>
+                    <button type="submit" class="btn">Adicionar atividade</button>
+                </form>
+                <!-- Preenchido so quando o jogo online esta ligado e faltam
+                     fases do jogo nesta turma (js/professor.js). -->
+                <div id="fases-jogo"></div>
+                <div id="lista-atividades"></div>
+            </section>
+
+            <section id="painel-turmas" role="tabpanel" aria-labelledby="aba-turmas" hidden>
+                <form id="form-turma" class="linha-form">
+                    <label class="campo">
+                        <span>Nome da nova turma</span>
+                        <input id="turma-nome" type="text" required maxlength="60">
+                    </label>
+                    <button type="submit" class="btn">Criar turma</button>
+                </form>
+                <div id="lista-turmas"></div>
+            </section>
+        </div>
     </main>
 
+    <script src="js/abas.js"></script>
     <script type="module" src="js/professor.js"></script>
 </body>
 </html>

@@ -175,3 +175,4 @@ test('data nulo em listagem devolve lista vazia, nao nulo', async () => {
   const cliente = clienteFalso({ data: null, error: null });
   assert.deepEqual(await criarDb(cliente).listarTurmas('prof-1'), []);
 });
+

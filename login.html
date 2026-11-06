@@ -3,43 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Educativa para Pessoas com Deficiências Intelectuais</title>
+    <title>Entrar - Plataforma Educativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/plataforma.css">
 </head>
 <body class="stars">
-    <main class="container">  
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <main class="cartao cartao-form">
+        <a class="voltar-inicio" href="index.html">← Início</a>
 
+        <!-- Os ids sao lidos por js/auth.js: nao renomear. -->
         <form id="login-form">
-            <h1>Login</h1>
+            <h1>Entrar</h1>
+            <p class="sub">Área do professor</p>
 
-            <div class="input-box">   
-                <input id="email-input" placeholder="Usuário" type="email" required>
-            </div>
+            <label class="campo">
+                <span>E-mail</span>
+                <input id="email-input" type="email" autocomplete="username" required>
+            </label>
 
-            <div class="input-box">   
-                <input id="senha-input" placeholder="Senha" type="password" required>
-            </div>
+            <label class="campo">
+                <span>Senha</span>
+                <span class="senha-caixa">
+                    <input id="senha-input" type="password" autocomplete="current-password" required>
+                    <button type="button" class="mostrar-senha" aria-controls="senha-input">Mostrar</button>
+                </span>
+            </label>
 
-            <div class="remember-forgot">
-             <label> 
-                Lembrar Senha
-                <input type="checkbox"> 
-             </label>
-                 <a href="#">Esqueci a senha</a>
-            </div>
+            <button type="submit" class="btn btn-largo">Entrar</button>
 
-          <button type="submit" class="login">Login</button>
-            <div class="register-link">
-                <!-- Sem a barra inicial: o site hospedado fica em
-                     fabianosannino.github.io/Jogo_Univesp/, e "/cadastro.html"
-                     aponta para a raiz do dominio (erro 404). Caminho relativo
-                     funciona nos dois lugares, local e publicado. -->
-                <p> Não possui cadastro? <a href="cadastro.html"> Criar uma conta</a></p>
-            </div>
+            <p class="nota">Não tem conta? <a href="cadastro.html">Criar uma conta</a></p>
+            <!-- Nao existe fluxo de "esqueci a senha": a troca passa pela equipe. -->
+            <p class="nota">Esqueceu a senha? Fale com a coordenação.</p>
         </form>
-
     </main>
+    <script src="js/senha.js"></script>
     <script type="module" src="js/auth.js"></script>
 </body>
 </html>

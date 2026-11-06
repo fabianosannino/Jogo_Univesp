@@ -32,7 +32,7 @@ function avisar(seletor, texto) {
 // Erro vai para a propria caixa: #aviso-fila e so da pendencia de fila, e
 // uma caixa nunca apaga a mensagem da outra.
 function erroNaTela(e) {
-  avisar('#aviso-erro', `Nao deu certo: ${e.message}`);
+  avisar('#aviso-erro', `Não deu certo: ${e.message}`);
 }
 
 const estado = {
@@ -50,6 +50,8 @@ const estado = {
 async function recarregarTurmas() {
   estado.turmas = await db.listarTurmas(professor.id);
   el('#lista-turmas').innerHTML = renderListaSimples(estado.turmas, 'turma');
+  // Professor sem nenhuma turma: o primeiro passo e criar uma.
+  if (estado.turmas.length === 0) window.abrirAba?.('turmas');
 
   // Ruling C27: escaparHtml em value e no texto do option; o replace inline nao
   // trata aspas duplas, que quebrariam o atributo value="..." (spec C27).
@@ -87,17 +89,14 @@ el('#form-turma').addEventListener('submit', async (evento) => {
   }
 });
 
+// A turma escolhida fica lembrada neste navegador: ao voltar, a professora cai
+// direto nela. (Antes havia o botao "Usar neste computador", que dizia qual
+// turma a tela do aluno mostrava; a tela do aluno agora e so o download do
+// jogo, entao o botao saiu.)
 el('#turma-select').addEventListener('change', async (evento) => {
   estado.turmaSelecionada = evento.target.value;
-  await recarregarTurma();
-});
-
-// Marca, nesta maquina, qual turma a tela do aluno deve mostrar.
-el('#usar-turma').addEventListener('click', () => {
-  if (!estado.turmaSelecionada) return;
   armazenamento.setItem('turma_ativa', estado.turmaSelecionada);
-  const turma = estado.turmas.find((t) => t.id === estado.turmaSelecionada);
-  avisar('#turma-ativa', `Este computador vai mostrar a turma "${turma.nome}" para os alunos.`);
+  await recarregarTurma();
 });
 
 // --- alunos e atividades ---
@@ -129,8 +128,8 @@ function proximaOrdem() {
     : 1;
 }
 
-// Com o jogo do navegador desligado, nada aparece: a fase so importa quando o
-// jogo pode grava-la.
+// Com o jogo online desligado, nada aparece: a fase so importa quando o jogo
+// pode grava-la.
 function desenharFasesDoJogo() {
   const faltando =
     CAMINHO_JOGO_WEB && estado.turmaSelecionada
@@ -215,9 +214,9 @@ document.addEventListener('click', async (evento) => {
 
   const { tipo, id } = botao.dataset;
   const confirmacoes = {
-    turma: 'Apagar a turma apaga tambem os alunos, as atividades e todo o progresso dela. Confirma?',
+    turma: 'Apagar a turma apaga também os alunos, as atividades e todo o progresso dela. Confirma?',
     aluno: 'Apagar o aluno apaga todo o progresso dele. Confirma?',
-    atividade: 'Apagar a atividade apaga as marcacoes dela. Confirma?',
+    atividade: 'Apagar a atividade apaga as marcações dela. Confirma?',
   };
   if (!window.confirm(confirmacoes[tipo])) return;
 
@@ -254,7 +253,7 @@ function mostrarPendencias() {
   avisar(
     '#aviso-fila',
     quantas > 0
-      ? `${quantas} marcacao(oes) aguardando a internet. Nao feche esta pagina.`
+      ? `${quantas} marcação(ões) aguardando a internet. Não feche esta página.`
       : ''
   );
 }

@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogar - Plataforma Educativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/plataforma.css">
 </head>
-<!-- Tela do jogo no navegador (versao WebGL). Arquivo novo, nao do layout do
-     Pedro: reusa o fundo dele (body.stars) e tem estilo proprio em
-     css/plataforma.css.
+<!-- Tela do jogo online (versao WebGL). Mesma moldura da tela do aluno
+     (.tela-aluno e .aluno-topo); estilo proprio em css/plataforma.css.
 
-     Chega-se aqui pelo botao "Jogar" da tela de progresso da crianca, com o id
-     dela no endereco (jogar.html?aluno=...). js/jogar.js abre o jogo num
-     <iframe> e escuta as fases concluidas. Sem aluno no endereco (ou sem
-     sessao do professor), o jogo abre do mesmo jeito, sem salvar. Com
-     CAMINHO_JOGO_WEB vazio em js/config.js, a pagina so explica que o jogo
-     online ainda nao existe: nenhum link do site leva ate ela nesse caso. -->
+     Chega-se aqui pelo botao "Jogar online" da crianca, com o id dela no
+     endereco (jogar.html?aluno=...). js/jogar.js abre o jogo num <iframe> e
+     escuta as fases concluidas. Sem aluno no endereco (ou sem sessao do
+     professor), o jogo abre do mesmo jeito, sem salvar. Com CAMINHO_JOGO_WEB
+     vazio em js/config.js, a pagina so explica que o jogo online ainda nao
+     existe: nenhum link do site leva ate ela nesse caso. -->
 <body class="stars">
-    <main class="tela-jogo">
-        <header class="jogo-topo">
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <main class="tela-aluno tela-jogo">
+        <header class="aluno-topo">
             <a class="voltar-jogo" href="principal.html">&larr; Voltar</a>
             <p id="quem-joga" class="quem-joga"></p>
             <p id="comemoracao" class="comemoracao" role="status" aria-live="polite"></p>

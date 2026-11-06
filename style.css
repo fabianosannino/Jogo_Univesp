@@ -1,36 +1,42 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Base visual da plataforma: cores, tipografia, cartoes, formularios, botoes.
+   O fundo e a chuva de estrelas de .estrelas (fim deste arquivo): o mesmo
+   desenho original do Pedro, animado de um jeito mais leve.
+
+   Paleta pensada para ler bem sobre o fundo escuro e para criancas com baixa
+   visao: papel quente, tinta verde-escura, um so acento (amarelo) usado tambem
+   no anel de foco. Nada de vermelho em tela de aluno (spec D7). */
+
+:root {
+  --papel: #fffcf5;
+  --papel-2: #f6f1e4;
+  --linha: #e3dbc8;
+  --tinta: #1d2b24;
+  --tinta-2: #55645b;
+  --verde: #1f6f4a;
+  --verde-escuro: #144d33;
+  --verde-claro: #e2f0e6;
+  --amarelo: #f4b740;
+  --amarelo-claro: #fff1cc;
+  --terra: #9c4a2c;          /* so para "apagar", e so na tela do professor */
+  --raio: 14px;
+  --raio-g: 22px;
+  --sombra: 0 2px 0 rgba(0, 0, 0, .06), 0 18px 40px rgba(0, 0, 0, .45);
+  --fonte: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-.game{
-  width: 80vw;
-  height: 100vh;
-  border-radius: 12px;
-  background-color: #32dbb1;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  position: relative;
-  align-items: center;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  display: flex;
   justify-content: center;
-  z-index: 1;
-}
-
-.lateral{
-  justify-content: left;
-  align-items: left;
-  position: initial;
- }
-
-body{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: url(./Forest-Background.jpg);
-    background-size: cover;
-    background-position: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #000;
+  font-family: var(--fonte);
+  color: var(--tinta);
+  line-height: 1.45;
 }
 
 body.stars {
@@ -39,325 +45,204 @@ body.stars {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url(./Forest-Background.jpg);
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-
-.container{
-  width: 420px;
-  background-color: #f1fcf307;
-  border: 2px solid rgba(252, 255, 252, 0.2);
-  border-radius: 10px;
-  color: #fff;
-  padding: 30px 40px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.507);
-  backdrop-filter: blur(10px);
-}
-
-.container h1{
-  font-size: 45px;
-  text-align: center;
-  text-shadow: 1px 1px 1px #ffffff8f;
-}
-
-.input-box{
-  position: relative;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 10%;
-  height: 40px;
-  margin: 2px -30px;
-}
-
-.input-box input{
-  width: 80%;
-  height: 80%;
-  background-color: #f1fbfd15;
-  border: 2px solid;
-  border-radius: 40px;
-  outline: none;
-  font-size: 16px;
-  color: #fff;  
-  padding: 20px 40px 20px 20px;
-}
-
-.input-box input::placeholder{
-  color: #ffffffa8;
-}
-
-.remember-forgot{
-  display: flex;
-  justify-content: space-between;
-  margin: 15px 0 15px;
-}
-
-.remember-forgot label input{
-  accent-color: #fff;
-  margin-left: 10px;
-}
-
-.remember-forgot a{
-  text-decoration: none;
-  color: #fff;
-}
-
-.remember-forgot a:hover {
-  text-decoration: underline;
-  color: rgb(0, 255, 157);
-  transition: 0.5s;
-}
-
-.login {
-  width: 90%;
-  margin: 30px;
-  justify-content: center;
-  align-items: center;
-  height: 50px;
-  background-color: #fff;
-  border: none;
-  border-radius: 40px;
-  cursor: pointer;
-  font-size: 16px;
-  color: black;
-  font-weight: 600;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-.login:hover{
-  background-color: rgb(226, 252, 232);
-  border: 2px solid rgb(175, 253, 223);
-  transition: 0.5s;
-}
-
-.register-link{
-  font-size: 14px;
-  text-align: center;
-  margin: 20px 0 15;
-}
-
-.register-link a{
-  text-decoration: none;
-  color: #fff;
-  font-weight: 600;
-}
-
-.register-link a:hover{
-  text-decoration: underline;
-  color: rgb(175, 253, 223);
-}
-
-.picture_img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.picture_image{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#picture_input{
-  display: none;
-}
-.picture{
-  width: 250px;
-  height: 250px;
-  background-image: url(avatar.jpg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  border: 3px dashed;
-  border-radius: 50%;
-  color: #141414;
-  cursor: pointer;
-  font-family: sans-serif;
-  transition: color 300ms;
-  font-weight: 600;
-  margin: 25px auto;
-  overflow: hidden;
-}
-
-.picture:hover{
-  color: #32dbb1;
-  background: #4b4b4bea;
-}
-
-.picture:active{
-  color: #32dbb1;
-  background-color: #32dbb1;
-}
-
-.picture:focus{
-  color: #32dbb1;
-  box-shadow: 0px 0px 10px;
-}
-
-.stars::before {
-  opacity: 100%;
-  content: "";
-  position: fixed;
-  inset: -145%;
-  rotate: -45deg;
   background: #000;
+  position: relative;
+  padding: 24px 16px;
+}
+
+h1, h2, h3 { font-weight: 800; line-height: 1.15; letter-spacing: -.01em; }
+
+a { color: var(--verde); }
+
+:focus-visible { outline: 3px solid var(--amarelo); outline-offset: 3px; }
+
+/* --- cartao: a folha de papel sobre o fundo --- */
+
+.cartao {
+  position: relative;
+  z-index: 1;                       /* acima do fundo .estrelas */
+  width: min(460px, 100%);
+  background: var(--papel);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra);
+  padding: 36px 36px 30px;
+}
+
+.sobretitulo {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--tinta-2);
+}
+
+/* --- formularios --- */
+
+.campo { display: block; margin-top: 18px; }
+.campo > span { display: block; font-weight: 700; margin-bottom: 6px; }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--tinta);
+  background: #fff;
+  border: 2px solid var(--linha);
+  border-radius: 10px;
+  transition: border-color .15s;
+}
+input:hover, select:hover { border-color: #cbbf9f; }
+input:focus, select:focus { outline: none; border-color: var(--verde); box-shadow: 0 0 0 3px var(--verde-claro); }
+
+/* --- botoes --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 22px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  text-decoration: none;
+  color: #fff;
+  background: var(--verde);
+  border: 0;
+  border-bottom: 3px solid var(--verde-escuro);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .15s, transform .05s;
+}
+.btn:hover { background: var(--verde-escuro); }
+.btn:active { transform: translateY(1px); border-bottom-width: 2px; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn-largo { width: 100%; }
+
+.btn-sec {
+  color: var(--verde-escuro);
+  background: #fff;
+  border: 2px solid var(--linha);
+  border-bottom-width: 3px;
+}
+.btn-sec:hover { background: var(--papel-2); }
+
+.btn-amarelo {
+  color: var(--tinta);
+  background: var(--amarelo);
+  border-bottom-color: #c98d17;
+}
+.btn-amarelo:hover { background: #ffc85a; }
+
+
+/* --- fundo de estrelas ---
+   O mesmo desenho do fundo original do Pedro (as 11 faixas de "chuva", com as
+   mesmas cores, tamanhos e velocidades), mas animado de outro jeito.
+
+   O original animava background-position de uma camada 4x maior que a tela:
+   isso obriga o navegador a redesenhar os 33 gradientes a cada quadro, e a
+   pagina caia para ~5 quadros por segundo (medido no Chrome, 1920x1080).
+   Aqui cada faixa e uma camada propria, desenhada uma vez so, que desliza com
+   transform -- o navegador so move a imagem pronta. Cada faixa anda exatamente
+   a altura do proprio ladrilho por ciclo, entao o laco nao tem emenda.
+   A marcacao e <div class="estrelas"><div><i></i> x 11</div></div> no inicio
+   do <body> de cada pagina. */
+
+.estrelas {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  pointer-events: none;
+}
+/* Quadrado girado 45 graus que cobre a tela inteira: o lado precisa ser
+   (largura + altura) / raiz de 2. */
+.estrelas > div {
+  position: absolute;
+  --lado: calc((100vw + 100vh) * .7072);
+  width: var(--lado);
+  height: var(--lado);
+  left: calc(50% - var(--lado) / 2);
+  top: calc(50% - var(--lado) / 2);
+  rotate: -45deg;
+}
+.estrelas i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: -300px;                         /* folga maior que o maior ladrilho (299px) */
+  height: calc(100% + 300px);
+  background-repeat: repeat;
+  will-change: transform;
+  animation: estrelas-cair var(--t) linear infinite;
+}
+@keyframes estrelas-cair {
+  to { transform: translateY(var(--h)); }
+}
+
+.estrelas i:nth-child(1) { --h: 235px; --t: 5.357s; background-size: 300px 235px;
+  background-position: 0 220px, 3px 220px, 151.5px 337.5px;
   background-image: radial-gradient(4px 100px at 0px 235px, #7b00ff, #0000),
     radial-gradient(4px 100px at 300px 235px, #3a0078, #0000),
-    radial-gradient(1.5px 1.5px at 150px 117.5px, #3a0078 100%, #0000 150%),
-    radial-gradient(4px 100px at 0px 252px, #3a0078, #0000),
+    radial-gradient(1.5px 1.5px at 150px 117.5px, #3a0078 100%, #0000 150%); }
+.estrelas i:nth-child(2) { --h: 252px; --t: 2.778s; background-size: 300px 252px;
+  background-position: 25px 24px, 28px 24px, 176.5px 150px;
+  background-image: radial-gradient(4px 100px at 0px 252px, #3a0078, #0000),
     radial-gradient(4px 100px at 300px 252px, #3a0078, #0000),
-    radial-gradient(1.5px 1.5px at 150px 126px, #3a0078 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 150px, #026ba8, #0000),
+    radial-gradient(1.5px 1.5px at 150px 126px, #3a0078 0%, #0000 0%); }
+.estrelas i:nth-child(3) { --h: 150px; --t: 4.167s; background-size: 300px 150px;
+  background-position: 50px 16px, 53px 16px, 201.5px 91px;
+  background-image: radial-gradient(4px 100px at 0px 150px, #026ba8, #0000),
     radial-gradient(4px 100px at 300px 150px, #026ba8, #0000),
-    radial-gradient(1.5px 1.5px at 150px 75px, #026ba8 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 253px, #026ba8, #0000),
+    radial-gradient(1.5px 1.5px at 150px 75px, #026ba8 0%, #0000 0%); }
+.estrelas i:nth-child(4) { --h: 253px; --t: 2.239s; background-size: 300px 253px;
+  background-position: 75px 224px, 78px 224px, 226.5px 350.5px;
+  background-image: radial-gradient(4px 100px at 0px 253px, #026ba8, #0000),
     radial-gradient(4px 100px at 300px 253px, #026ba8, #0000),
-    radial-gradient(1.5px 1.5px at 150px 126.5px, #026ba8 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 204px, #1202a8, #0000),
+    radial-gradient(1.5px 1.5px at 150px 126.5px, #026ba8 0%, #0000 0%); }
+.estrelas i:nth-child(5) { --h: 204px; --t: 6s; background-size: 300px 204px;
+  background-position: 100px 19px, 103px 19px, 251.5px 121px;
+  background-image: radial-gradient(4px 100px at 0px 204px, #1202a8, #0000),
     radial-gradient(4px 100px at 300px 204px, #1202a8, #0000),
-    radial-gradient(1.5px 1.5px at 150px 102px, #1202a8 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 179px, #1202a8, #0000),
+    radial-gradient(1.5px 1.5px at 150px 102px, #1202a8 0%, #0000 0%); }
+.estrelas i:nth-child(6) { --h: 134px; --t: 2.419s; background-size: 300px 134px;
+  background-position: 125px 120px, 128px 120px, 276.5px 187px;
+  background-image: radial-gradient(4px 100px at 0px 179px, #1202a8, #0000),
     radial-gradient(4px 100px at 300px 179px, #1202a8, #0000),
-    radial-gradient(1.5px 1.5px at 150px 89.5px, #1202a8 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 299px, #42095e, #0000),
+    radial-gradient(1.5px 1.5px at 150px 89.5px, #1202a8 0%, #0000 0%); }
+.estrelas i:nth-child(7) { --h: 179px; --t: 2.727s; background-size: 300px 179px;
+  background-position: 150px 31px, 153px 31px, 301.5px 120.5px;
+  background-image: radial-gradient(4px 100px at 0px 299px, #42095e, #0000),
     radial-gradient(4px 100px at 300px 299px, #42095e, #0000),
-    radial-gradient(1.5px 1.5px at 150px 149.5px, #42095e 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 215px, #42095e, #0000),
+    radial-gradient(1.5px 1.5px at 150px 149.5px, #42095e 0%, #0000 0%); }
+.estrelas i:nth-child(8) { --h: 299px; --t: 3.409s; background-size: 300px 299px;
+  background-position: 175px 235px, 178px 235px, 326.5px 384.5px;
+  background-image: radial-gradient(4px 100px at 0px 215px, #42095e, #0000),
     radial-gradient(4px 100px at 300px 215px, #42095e, #0000),
-    radial-gradient(1.5px 1.5px at 150px 107.5px, #42095e 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 281px, #96097f, #0000),
+    radial-gradient(1.5px 1.5px at 150px 107.5px, #42095e 0%, #0000 0%); }
+.estrelas i:nth-child(9) { --h: 215px; --t: 2.206s; background-size: 300px 215px;
+  background-position: 200px 121px, 203px 121px, 351.5px 228.5px;
+  background-image: radial-gradient(4px 100px at 0px 281px, #96097f, #0000),
     radial-gradient(4px 100px at 300px 281px, #96097f, #0000),
-    radial-gradient(1.5px 1.5px at 150px 140.5px, #96097f 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 158px, #96097f, #0000),
+    radial-gradient(1.5px 1.5px at 150px 140.5px, #96097f 0%, #0000 0%); }
+.estrelas i:nth-child(10) { --h: 281px; --t: 2.273s; background-size: 300px 281px;
+  background-position: 225px 224px, 228px 224px, 376.5px 364.5px;
+  background-image: radial-gradient(4px 100px at 0px 158px, #96097f, #0000),
     radial-gradient(4px 100px at 300px 158px, #96097f, #0000),
-    radial-gradient(1.5px 1.5px at 150px 79px, #96097f 0%, #0000 0%),
-    radial-gradient(4px 100px at 0px 210px, #32dbb1, #0000),
+    radial-gradient(1.5px 1.5px at 150px 79px, #96097f 0%, #0000 0%); }
+.estrelas i:nth-child(11) { --h: 158px; --t: 4.688s; background-size: 300px 158px;
+  background-position: 250px 26px, 253px 26px, 401.5px 105px;
+  background-image: radial-gradient(4px 100px at 0px 210px, #32dbb1, #0000),
     radial-gradient(4px 100px at 300px 210px, #32dbb1, #0000),
-    radial-gradient(1.5px 1.5px at 150px 105px, #32dbb1 00%, #0000 10%);
-  background-size:
-    300px 235px,
-    300px 235px,
-    300px 235px,
-    300px 252px,
-    300px 252px,
-    300px 252px,
-    300px 150px,
-    300px 150px,
-    300px 150px,
-    300px 253px,
-    300px 253px,
-    300px 253px,
-    300px 204px,
-    300px 204px,
-    300px 204px,
-    300px 134px,
-    300px 134px,
-    300px 134px,
-    300px 179px,
-    300px 179px,
-    300px 179px,
-    300px 299px,
-    300px 299px,
-    300px 299px,
-    300px 215px,
-    300px 215px,
-    300px 215px,
-    300px 281px,
-    300px 281px,
-    300px 281px,
-    300px 158px,
-    300px 158px,
-    300px 158px,
-    300px 210px,
-    300px 210px,
-    300px 210px;
-  animation: hi 150s linear infinite;
-}
+    radial-gradient(1.5px 1.5px at 150px 105px, #32dbb1 0%, #0000 10%); }
 
-@keyframes hi {
-  0% {
-    background-position:
-      0px 220px,
-      3px 220px,
-      151.5px 337.5px,
-      25px 24px,
-      28px 24px,
-      176.5px 150px,
-      50px 16px,
-      53px 16px,
-      201.5px 91px,
-      75px 224px,
-      78px 224px,
-      226.5px 350.5px,
-      100px 19px,
-      103px 19px,
-      251.5px 121px,
-      125px 120px,
-      128px 120px,
-      276.5px 187px,
-      150px 31px,
-      153px 31px,
-      301.5px 120.5px,
-      175px 235px,
-      178px 235px,
-      326.5px 384.5px,
-      200px 121px,
-      203px 121px,
-      351.5px 228.5px,
-      225px 224px,
-      228px 224px,
-      376.5px 364.5px,
-      250px 26px,
-      253px 26px,
-      401.5px 105px,
-      275px 75px,
-      278px 75px,
-      426.5px 180px;
-  }
-  to {
-    background-position:
-      0px 6800px,
-      3px 6800px,
-      151.5px 6917.5px,
-      25px 13632px,
-      28px 13632px,
-      176.5px 13758px,
-      50px 5416px,
-      53px 5416px,
-      201.5px 5491px,
-      75px 17175px,
-      78px 17175px,
-      226.5px 17301.5px,
-      100px 5119px,
-      103px 5119px,
-      251.5px 5221px,
-      125px 8428px,
-      128px 8428px,
-      276.5px 8495px,
-      150px 9876px,
-      153px 9876px,
-      301.5px 9965.5px,
-      175px 13391px,
-      178px 13391px,
-      326.5px 13540.5px,
-      200px 14741px,
-      203px 14741px,
-      351.5px 14848.5px,
-      225px 18770px,
-      228px 18770px,
-      376.5px 18910.5px,
-      250px 5082px,
-      253px 5082px,
-      401.5px 5161px,
-      275px 6375px,
-      278px 6375px,
-      426.5px 6480px;
-  }
+/* Quem pediu menos movimento no sistema ve as estrelas paradas. */
+@media (prefers-reduced-motion: reduce) {
+  .estrelas i { animation: none; }
 }

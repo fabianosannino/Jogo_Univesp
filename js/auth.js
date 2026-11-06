@@ -107,7 +107,7 @@ if (formCadastro) {
     const confirmacao = formCadastro.querySelector('#senha-confirma-input').value;
 
     if (senha !== confirmacao) {
-      mostrarErro(formCadastro, 'As duas senhas nao sao iguais.');
+      mostrarErro(formCadastro, 'As duas senhas não são iguais.');
       return;
     }
 

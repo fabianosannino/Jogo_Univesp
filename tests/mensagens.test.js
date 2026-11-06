@@ -23,7 +23,7 @@ test('conta sem confirmacao diz o que fazer antes de entrar', () => {
 test('e-mail repetido avisa que ja existe conta', () => {
   assert.equal(
     traduzirErroAuth('User already registered'),
-    'Este e-mail ja tem conta.'
+    'Este e-mail já tem conta.'
   );
 });
 
@@ -45,20 +45,20 @@ test('limite de e-mail do Supabase manda esperar, nao mostra ingles', () => {
 test('autocadastro desligado manda procurar a equipe', () => {
   assert.match(
     traduzirErroAuth('Signups not allowed for this instance'),
-    /cadastro esta fechado/
+    /cadastro está fechado/
   );
 });
 
 test('e-mail mal digitado pede para conferir a escrita', () => {
   assert.match(
     traduzirErroAuth('Unable to validate email address: invalid format'),
-    /nao parece valido/
+    /não parece válido/
   );
 });
 
 test('sem internet nao fala de fetch', () => {
   const texto = traduzirErroAuth('TypeError: Failed to fetch');
-  assert.equal(texto, 'Sem conexao com a internet.');
+  assert.equal(texto, 'Sem conexão com a internet.');
   assert.doesNotMatch(texto, /fetch/i);
 });
 

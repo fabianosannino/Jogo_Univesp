@@ -3,38 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Educativa para Pessoas com Deficiências Intelectuais</title>
+    <title>Plataforma Educativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/plataforma.css">
 </head>
-<!-- Porta de entrada do site hospedado. Ela existe porque um endereco como
-     fabianosannino.github.io/Jogo_Univesp/ abre a raiz, e sem index.html a
-     raiz devolve erro 404 -- o site publicado nao teria entrada nenhuma.
-
-     Duas portas e nao uma: quem abre este endereco e ou o professor, que quer
-     entrar na conta dele, ou a crianca na maquina da escola, que quer ver o
-     proprio progresso. Mandar a crianca para a tela de login seria pedir que
-     ela digitasse algo, e a decisao de projeto e que ela nunca digita.
-
-     Arquivo novo, nao alteracao do layout do Pedro: reusa as classes dele
-     (.container, .login) para ficar igual ao resto, sem tocar no style.css. -->
+<!-- Porta de entrada. Duas portas, nao um login: a crianca na maquina da
+     escola vai direto para a tela dela, sem digitar nada (spec D3). -->
 <body class="stars">
-    <main class="container porta">
-        <h1>Bem-vindo</h1>
-
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <main class="cartao porta">
+        <p class="sobretitulo">Projeto Integrador · UNIVESP</p>
+        <h1>Plataforma Educativa</h1>
         <p class="porta-texto">Quem está usando o computador agora?</p>
 
-        <a class="login porta-botao" href="principal.html">
-            Sou aluno — ver meu progresso
-        </a>
-
-        <a class="login porta-botao" href="login.html">
-            Sou professor — entrar na minha conta
-        </a>
-
-        <p class="porta-rodape">
-            Projeto Integrador — UNIVESP
-        </p>
+        <div class="escolhas">
+            <a class="escolha escolha-aluno" href="principal.html">
+                <span class="escolha-icone" aria-hidden="true">🎒</span>
+                <strong>Sou aluno</strong>
+            </a>
+            <a class="escolha" href="login.html">
+                <span class="escolha-icone" aria-hidden="true">📋</span>
+                <strong>Sou professor</strong>
+            </a>
+        </div>
     </main>
 </body>
 </html>

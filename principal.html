@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Educativa para Pessoas com Deficiências Intelectuais</title>
+    <title>Vamos jogar! - Plataforma Educativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/plataforma.css">
 </head>
+<!-- Tela do aluno, desenhada por js/aluno.js: escolhe a turma, depois o
+     proprio nome, ve as proprias estrelas e joga (online, se existir, ou
+     baixando a versao Windows). A crianca nao digita nada; quem marca o
+     progresso e a professora, e o jogo online quando existir. -->
 <body class="stars">
-    <!-- O aria-hidden abaixo e aditivo (so um atributo) e resolve um problema
-         de acessibilidade: o conteudo deste <h1> e a letra "a", residuo de
-         maquete, e um leitor de tela anuncia "titulo de nivel 1, a" antes de
-         qualquer coisa util. Escondido da leitura, o desenho da tela fica
-         identico: o elemento continua ocupando a coluna da esquerda, que e
-         para o que ele serve hoje.
-         O <h1>O jogo vai aqui!</h1> logo abaixo tambem e residuo, mas a
-         crianca o LE: esconder nao resolve, trocar o texto nao e aditivo, e
-         a altura dele esta embutida no calc(100vh - 140px) do #raiz-aluno em
-         css/plataforma.css. Fica para o Pedro, ou com o aval dele. -->
-    <aside class="lateral">
-        <h1 style="color: white; position: relative;;" aria-hidden="true">a</h1>
-    </aside>
-    <main class="game">
-        <h1>O jogo vai aqui!</h1>
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <main class="tela-aluno">
+        <header class="aluno-topo">
+            <h1>Vamos jogar!</h1>
+            <a href="index.html">Início</a>
+        </header>
         <div id="raiz-aluno"></div>
     </main>
     <script type="module" src="js/aluno.js"></script>
