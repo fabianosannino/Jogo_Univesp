@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogar - Plataforma Educativa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/plataforma.css">
+</head>
+<!-- Tela do jogo no navegador (versao WebGL). Arquivo novo, nao do layout do
+     Pedro: reusa o fundo dele (body.stars) e tem estilo proprio em
+     css/plataforma.css.
+
+     Chega-se aqui pelo botao "Jogar" da tela de progresso da crianca, com o id
+     dela no endereco (jogar.html?aluno=...). js/jogar.js abre o jogo num
+     <iframe> e escuta as fases concluidas. Com CAMINHO_JOGO_WEB vazio em
+     js/config.js, a pagina so explica que o jogo no navegador ainda nao
+     existe: nenhum link do site leva ate ela nesse caso. -->
+<body class="stars">
+    <main class="tela-jogo">
+        <header class="jogo-topo">
+            <a class="voltar-jogo" href="principal.html">&larr; Voltar</a>
+            <p id="quem-joga" class="quem-joga"></p>
+            <p id="comemoracao" class="comemoracao" role="status" aria-live="polite"></p>
+        </header>
+        <div id="area-jogo" class="area-jogo">
+            <p class="carregando">Carregando o jogo...</p>
+        </div>
+    </main>
+    <script type="module" src="js/jogar.js"></script>
+</body>
+</html>

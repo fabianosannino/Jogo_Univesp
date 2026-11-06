@@ -193,3 +193,55 @@
 .porta-botao:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
 
 .porta-rodape { font-size: .9rem; opacity: .85; margin-top: 8px; }
+
+/* --- jogo no navegador (versao WebGL) --- */
+
+/* Botao "Jogar" na tela de progresso da crianca. Maior e mais chamativo que o
+   de baixar: quando a versao do navegador existe, e a acao principal. */
+.jogar { margin: 16px 0; }
+.botao-jogar {
+  display: inline-flex; align-items: center; gap: 10px;
+  min-height: 64px; padding: 14px 32px;
+  font-size: 1.6rem; font-weight: 700;
+  background: #0b6b45; color: #fff;
+  border-radius: 14px; text-decoration: none;
+}
+.botao-jogar:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+
+/* Selo do jogo na grade do professor: ao lado do botao, nunca dentro dele, para
+   ficar claro que o botao e so a marcacao da professora. */
+.selo-jogo { margin-left: 4px; font-size: 1.1rem; vertical-align: middle; cursor: help; }
+.legenda { margin-top: 8px; font-size: .95rem; color: #333; }
+
+.lista-fases { margin: 0 0 12px 20px; }
+#incluir-fases { min-height: 40px; padding: 0 14px; cursor: pointer; }
+
+/* jogar.html. Mesmo truque do .painel: z-index proprio para ficar acima da
+   animacao de estrelas do body.stars (style.css). */
+.tela-jogo {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  width: min(1200px, 98vw); height: 96vh;
+  background: #10361f; color: #fff;
+  border-radius: 12px; overflow: hidden;
+}
+.jogo-topo {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 10px 16px;
+}
+.voltar-jogo {
+  display: inline-flex; align-items: center;
+  min-height: 48px; padding: 0 18px;           /* alvo grande: mao de crianca */
+  font-size: 1.2rem; font-weight: 700;
+  background: #fff; color: #10361f;
+  border-radius: 10px; text-decoration: none;
+}
+.voltar-jogo:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+.quem-joga { font-size: 1.4rem; font-weight: 700; }
+.quem-joga span { font-size: 1.8rem; vertical-align: middle; }
+.comemoracao { margin-left: auto; font-size: 1.3rem; font-weight: 700; color: #ffd400; }
+
+.area-jogo { flex: 1; min-height: 0; background: #000; }
+.area-jogo .aviso, .area-jogo .carregando { margin: 24px; }
+.area-jogo .carregando { color: #fff; font-size: 1.3rem; }
+.quadro-jogo { display: block; width: 100%; height: 100%; border: 0; }

@@ -1,7 +1,7 @@
 // Geracao de HTML. Funcoes puras: entram dados, sai string. Nao existe
 // document aqui, e e isso que torna a interface testavel sem navegador.
 
-import { acharAvatar, AVATARES, URL_DOWNLOAD_JOGO } from './config.js';
+import { acharAvatar, AVATARES, URL_DOWNLOAD_JOGO, CAMINHO_JOGO_WEB } from './config.js';
 
 // Nome de aluno vem digitado pelo professor ou colado de uma lista da escola.
 // Sem escapar, um nome com < executa codigo; um nome com & quebra a tela.
@@ -41,22 +41,37 @@ export function renderGrade(grade) {
     .map((a) => `<th scope="col">${escaparHtml(a.titulo)}</th>`)
     .join('');
 
+  let algumPeloJogo = false;
+
   const corpo = grade.linhas
     .map((linha) => {
       const celulas = linha.celulas
         .map((c) => {
-          const rotulo = c.concluida
-            ? `Desmarcar ${c.titulo} de ${linha.aluno.nome}`
-            : `Marcar ${c.titulo} de ${linha.aluno.nome}`;
+          // O botao e so da professora: apertado = ELA marcou. O que o jogo
+          // gravou aparece ao lado, como selo, e nao mexe no botao. Antes, uma
+          // celula so com registro do jogo vinha apertada; o clique mandava
+          // "desmarcar", que so apaga a origem 'professor', e a marca ficava
+          // presa na tela sem a professora conseguir tira-la.
+          const origens = c.origens ?? [];
+          const peloProfessor = origens.includes('professor');
+          const peloJogo = origens.includes('jogo');
+          if (peloJogo) algumPeloJogo = true;
+
+          const rotulo =
+            `${peloProfessor ? 'Desmarcar' : 'Marcar'} ${c.titulo} de ${linha.aluno.nome}` +
+            (peloJogo ? ' (já concluída no jogo)' : '');
+          const selo = peloJogo
+            ? `<span class="selo-jogo" title="Concluída no jogo" aria-hidden="true">\u{1F3AE}</span>`
+            : '';
           return (
             `<td>` +
             `<button type="button" class="celula" ` +
             `data-aluno="${escaparHtml(linha.aluno.id)}" ` +
             `data-atividade="${escaparHtml(c.atividade_id)}" ` +
-            `aria-pressed="${c.concluida}" ` +
+            `aria-pressed="${peloProfessor}" ` +
             `aria-label="${escaparHtml(rotulo)}">` +
-            `<span aria-hidden="true">${c.concluida ? '\u2714' : '\u00A0'}</span>` +
-            `</button></td>`
+            `<span aria-hidden="true">${peloProfessor ? '\u2714' : '\u00A0'}</span>` +
+            `</button>${selo}</td>`
           );
         })
         .join('');
@@ -68,9 +83,35 @@ export function renderGrade(grade) {
     })
     .join('');
 
+  // A legenda so aparece quando ha selo para explicar: turma sem jogo no
+  // navegador fica com a grade igual a de sempre.
+  const legenda = algumPeloJogo
+    ? `<p class="legenda"><span aria-hidden="true">\u2714</span> = você marcou. ` +
+      `<span aria-hidden="true">\u{1F3AE}</span> = a criança terminou essa fase no jogo ` +
+      `(fica separado da sua marcação).</p>`
+    : '';
+
   return (
     `<table class="grade"><thead><tr><th scope="col">Aluno</th>${cabecalho}` +
-    `<th scope="col">Total</th></tr></thead><tbody>${corpo}</tbody></table>`
+    `<th scope="col">Total</th></tr></thead><tbody>${corpo}</tbody></table>${legenda}`
+  );
+}
+
+// Aviso na area de atividades do professor quando o jogo do navegador esta
+// ligado e a turma ainda nao tem todas as fases como atividade. Sem a
+// atividade, a fase concluida no jogo nao tem onde ser gravada
+// (js/ponte-jogo.js). O botao inclui as que faltam de uma vez.
+export function renderFasesDoJogo(faltando) {
+  if (!Array.isArray(faltando) || faltando.length === 0) return '';
+  const nomes = faltando.map((f) => `<li>${escaparHtml(f.titulo)}</li>`).join('');
+  const quantas = faltando.length === 1 ? '1 fase' : `${faltando.length} fases`;
+  return (
+    aviso(
+      `O jogo tem ${quantas} que esta turma ainda não tem como atividade. ` +
+        `Sem a atividade, o que a criança fizer nessa fase do jogo não aparece na grade.`
+    ) +
+    `<ul class="lista-fases">${nomes}</ul>` +
+    `<button type="button" id="incluir-fases">Incluir as fases do jogo</button>`
   );
 }
 
@@ -148,7 +189,9 @@ export function renderAvataresDaTurma(alunos) {
   return `<div class="avatares">${botoes}</div>`;
 }
 
-export function renderProgressoDoAluno(linha) {
+// `opcoes.caminhoJogoWeb` existe para o teste poder ligar e desligar a versao
+// do navegador; a tela usa o valor de js/config.js.
+export function renderProgressoDoAluno(linha, { caminhoJogoWeb = CAMINHO_JOGO_WEB } = {}) {
   const avatar = acharAvatar(linha.aluno.avatar);
   const emoji = avatar ? avatar.emoji : '\u{1F31F}';
   const total = linha.celulas.length;
@@ -170,9 +213,20 @@ export function renderProgressoDoAluno(linha) {
   // Nota: "${linha.concluidas} de ${total}" ficam dentro do mesmo <strong>
   // para que o vao entre os dois numeros seja curto (" de ", 4 chars) e
   // o leitor de tela leia "1 de 2" de forma continua.
+  //
+  // O botao "Jogar" fica aqui, e nao na tela dos bichinhos, porque e aqui que
+  // se sabe QUEM vai jogar: o endereco leva o id do aluno, e e para ele que as
+  // fases concluidas sao gravadas.
+  const jogar = caminhoJogoWeb
+    ? `<p class="jogar"><a class="botao-jogar" ` +
+      `href="jogar.html?aluno=${escaparHtml(encodeURIComponent(linha.aluno.id))}">` +
+      `<span aria-hidden="true">\u{1F3AE}</span> Jogar</a></p>`
+    : '';
+
   return (
     `<section class="progresso-aluno">` +
     `<h2><span class="emoji" aria-hidden="true">${emoji}</span> ${escaparHtml(linha.aluno.nome)}</h2>` +
+    jogar +
     `<p class="contagem">Voce ja conseguiu <strong>${linha.concluidas} de ${total}</strong></p>` +
     `<ul class="atividades">${itens}</ul>` +
     `<button type="button" class="voltar">Voltar</button>` +
@@ -180,7 +234,7 @@ export function renderProgressoDoAluno(linha) {
   );
 }
 
-export function renderAreaAluno(estado) {
+export function renderAreaAluno(estado, opcoes = {}) {
   let conteudo;
 
   if (estado.estado === 'sem-turma') {
@@ -190,7 +244,7 @@ export function renderAreaAluno(estado) {
   } else if (estado.estado === 'erro') {
     conteudo = aviso('Nao foi possivel carregar agora. Chame o professor.');
   } else if (estado.estado === 'progresso') {
-    conteudo = renderProgressoDoAluno(estado.linha);
+    conteudo = renderProgressoDoAluno(estado.linha, opcoes);
   } else if (!estado.alunos || estado.alunos.length === 0) {
     conteudo = aviso('Nenhum aluno cadastrado nesta turma. Chame o professor.');
   } else {
@@ -199,16 +253,21 @@ export function renderAreaAluno(estado) {
       renderAvataresDaTurma(estado.alunos);
   }
 
-  return `<section id="area-aluno">${conteudo}${blocoDownload()}</section>`;
+  return `<section id="area-aluno">${conteudo}${blocoDownload(opcoes)}</section>`;
 }
 
 // Sem URL configurada, devolve string vazia: a tela da crianca nunca mostra um
 // link para arquivo que nao existe. Com URL, um botao grande e escapado.
-function blocoDownload() {
+//
+// Com a versao do navegador ligada, o download continua -- e o plano B para
+// computador fraco demais para o jogo no navegador -- e o texto diz qual
+// versao e, para nao parecer que sao dois jogos diferentes.
+function blocoDownload({ caminhoJogoWeb = CAMINHO_JOGO_WEB } = {}) {
   if (!URL_DOWNLOAD_JOGO) return '';
+  const texto = caminhoJogoWeb ? 'Baixar o jogo para Windows' : 'Baixar o jogo';
   return (
     `<p class="download">` +
-    `<a class="botao-baixar" href="${escaparHtml(URL_DOWNLOAD_JOGO)}">Baixar o jogo</a>` +
+    `<a class="botao-baixar" href="${escaparHtml(URL_DOWNLOAD_JOGO)}">${texto}</a>` +
     `</p>`
   );
 }

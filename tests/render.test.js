@@ -7,6 +7,7 @@ import {
   renderProgressoDoAluno,
   renderAreaAluno,
   renderSeletorAvatar,
+  renderFasesDoJogo,
 } from '../js/render.js';
 import { URL_DOWNLOAD_JOGO, AVATARES } from '../js/config.js';
 import { montarGrade, montarLinhaDoAluno } from '../js/grade.js';
@@ -77,6 +78,63 @@ test('celula concluida e marcada; pendente nao recebe marca de erro', () => {
   assert.ok(html.includes('aria-pressed="true"'), 'falta estado marcado');
   assert.ok(html.includes('aria-pressed="false"'), 'falta estado pendente');
   assert.ok(!/\u274C|\u2716/.test(html), 'pendente nao pode levar X (spec D7)');
+});
+
+// --- grade com o que o jogo gravou ---
+
+test('celula so com registro do jogo NAO aparece como marcada pela professora', () => {
+  const g = montarGrade(ALUNOS, ATIVIDADES, [
+    { aluno_id: 'a1', atividade_id: 'at1', origem: 'jogo' },
+  ]);
+  const html = renderGrade(g);
+  const celula = html.match(/<td><button[^>]*data-aluno="a1"[^>]*data-atividade="at1"[^>]*>.*?<\/td>/)[0];
+
+  // Se viesse apertada, o clique mandaria "desmarcar", que so apaga a origem
+  // professor: a marca ficaria presa na tela.
+  assert.match(celula, /aria-pressed="false"/);
+  assert.match(celula, /aria-label="Marcar Contar ate 10 de Ana \(já concluída no jogo\)"/);
+  assert.match(celula, /class="selo-jogo"/, 'falta o selo do jogo');
+  assert.ok(!celula.includes('✔'), 'o visto e so da professora');
+});
+
+test('celula com professora e jogo mostra os dois, separados', () => {
+  const g = montarGrade(ALUNOS, ATIVIDADES, [
+    { aluno_id: 'a1', atividade_id: 'at1', origem: 'professor' },
+    { aluno_id: 'a1', atividade_id: 'at1', origem: 'jogo' },
+  ]);
+  const celula = renderGrade(g).match(/<td><button[^>]*data-aluno="a1"[^>]*data-atividade="at1"[^>]*>.*?<\/td>/)[0];
+  assert.match(celula, /aria-pressed="true"/);
+  assert.ok(celula.includes('✔'));
+  assert.match(celula, /class="selo-jogo"/);
+});
+
+test('a legenda do selo so aparece quando ha registro do jogo', () => {
+  const semJogo = renderGrade(montarGrade(ALUNOS, ATIVIDADES, [
+    { aluno_id: 'a1', atividade_id: 'at1', origem: 'professor' },
+  ]));
+  assert.ok(!semJogo.includes('class="legenda"'), 'turma sem jogo fica com a grade de sempre');
+  assert.ok(!semJogo.includes('selo-jogo'));
+
+  const comJogo = renderGrade(montarGrade(ALUNOS, ATIVIDADES, [
+    { aluno_id: 'a2', atividade_id: 'at2', origem: 'jogo' },
+  ]));
+  assert.match(comJogo, /class="legenda"/);
+});
+
+test('aviso das fases do jogo some quando nao falta nenhuma', () => {
+  assert.equal(renderFasesDoJogo([]), '');
+  assert.equal(renderFasesDoJogo(undefined), '');
+});
+
+test('aviso das fases do jogo lista as que faltam, escapadas, e oferece o botao', () => {
+  const html = renderFasesDoJogo([
+    { codigo: 'x', titulo: '<b>Cores</b>' },
+    { codigo: 'y', titulo: 'Contar' },
+  ]);
+  assert.match(html, /2 fases/);
+  assert.ok(html.includes('&lt;b&gt;Cores&lt;/b&gt;'));
+  assert.ok(!html.includes('<b>Cores</b>'));
+  assert.match(html, /id="incluir-fases"/);
 });
 
 test('grade vazia explica o que falta em vez de mostrar nada', () => {
@@ -264,4 +322,59 @@ test('com o jogo publicado, toda tela do aluno oferece o download', () => {
 // deixa a constante cair para http por descuido numa troca de hospedagem.
 test('a URL do jogo e https', () => {
   assert.match(URL_DOWNLOAD_JOGO, /^https:\/\//, 'o download tem de ser por https');
+});
+
+// --- as duas versoes do jogo ---
+//
+// CAMINHO_JOGO_WEB vazio = so a versao Windows, exatamente como antes.
+// Preenchido = a tela de cada crianca ganha "Jogar", e o download continua.
+
+function linhaDaAna() {
+  const g = montarGrade(ALUNOS, ATIVIDADES, [
+    { aluno_id: 'a1', atividade_id: 'at1', origem: 'professor' },
+  ]);
+  return montarLinhaDoAluno(g, 'a1');
+}
+
+test('sem a versao do navegador, nenhuma tela do aluno mostra "Jogar"', () => {
+  const opcoes = { caminhoJogoWeb: '' };
+  const telas = [
+    renderAreaAluno({ estado: 'sem-turma' }, opcoes),
+    renderAreaAluno({ estado: 'escolher', alunos: ALUNOS }, opcoes),
+    renderAreaAluno({ estado: 'progresso', linha: linhaDaAna() }, opcoes),
+  ];
+  for (const html of telas) {
+    assert.ok(!html.includes('botao-jogar'), 'botao Jogar sem jogo para abrir');
+    assert.ok(!html.includes('jogar.html'));
+    assert.match(html, />Baixar o jogo</, 'o download continua igual ao de hoje');
+  }
+});
+
+test('com a versao do navegador, a tela da crianca leva o id dela ao jogo', () => {
+  const html = renderAreaAluno(
+    { estado: 'progresso', linha: linhaDaAna() },
+    { caminhoJogoWeb: 'jogo-web/index.html' }
+  );
+  assert.match(html, /class="botao-jogar" href="jogar\.html\?aluno=a1"/);
+  assert.match(html, /Baixar o jogo para Windows/, 'o .exe continua como plano B');
+});
+
+test('"Jogar" so aparece na tela de quem vai jogar, nunca na lista de bichinhos', () => {
+  const opcoes = { caminhoJogoWeb: 'jogo-web/index.html' };
+  const html = renderAreaAluno({ estado: 'escolher', alunos: ALUNOS }, opcoes);
+  assert.ok(!html.includes('botao-jogar'), 'sem saber quem e a crianca, nao ha para quem gravar');
+});
+
+test('id estranho no botao Jogar vai codificado e escapado', () => {
+  const linha = { ...linhaDaAna(), aluno: { id: 'a"1&<x>', nome: 'Ana', avatar: 'coruja' } };
+  const html = renderProgressoDoAluno(linha, { caminhoJogoWeb: 'jogo-web/index.html' });
+  assert.ok(html.includes('href="jogar.html?aluno=a%221%26%3Cx%3E"'));
+  assert.ok(!html.includes('<x>'));
+});
+
+test('o botao Jogar nao e controle de escrita (spec D3)', () => {
+  const html = renderProgressoDoAluno(linhaDaAna(), { caminhoJogoWeb: 'jogo-web/index.html' });
+  assert.ok(!html.includes('<input'));
+  assert.ok(!html.includes('<form'));
+  assert.ok(!html.includes('aria-pressed'));
 });

@@ -74,22 +74,36 @@ que não deu para ser aditivo. Quem for mexer, mantenha isso.
 
 ---
 
-## O que ainda NÃO está ligado
+## O jogo: duas versões, a mesma plataforma
 
-**O jogo e a plataforma funcionam lado a lado, não juntos.** O botão "Baixar o jogo"
-entrega o jogo certo, mas quando a criança joga, **o jogo não avisa a plataforma** —
-quem marca o que foi concluído é a professora, na mão.
+A plataforma aceita as duas versões do jogo da Olívia, e quem escolhe é uma linha de
+`js/config.js`:
 
-O banco já está pronto para os dois casos: cada progresso grava uma origem,
-`'professor'` ou `'jogo'` (`sql/schema.sql`). Hoje só existe `'professor'`; o lugar do
-jogo está pronto e vazio.
+| | Windows (`.exe`) — **ligada hoje** | Navegador (WebGL) — **pronta, esperando a build** |
+|---|---|---|
+| Como a criança joga | baixa pelo botão "Baixar o jogo" | clica em **"Jogar"** na tela dela; o jogo abre dentro da plataforma |
+| Quem registra o progresso | a professora, na grade | o próprio jogo, a cada fase concluída |
+| Como liga | `URL_DOWNLOAD_JOGO` | `CAMINHO_JOGO_WEB` + `FASES_DO_JOGO` |
 
-Ligar isso tem dois caminhos, e **a escolha é uma decisão de equipe ainda aberta**:
+Com `CAMINHO_JOGO_WEB` vazio, que é o estado de hoje, **nada muda** para quem usa. Quando
+a build WebGL existir:
 
-- **Caminho A** — o jogo faz uma chamada de rede ao fim de cada fase e a plataforma
-  registra sozinha. Mais completo; exige mexer no projeto Unity.
-- **Caminho B** — a plataforma só exibe o que o jogo guardar no próprio computador.
-  Mais rápido; o progresso fica preso àquela máquina.
+1. a tela de cada criança ganha o botão **"Jogar"** (`jogar.html`), e o download continua
+   como plano B, com o texto "Baixar o jogo para Windows";
+2. cada fase que a criança termina vira progresso com origem `'jogo'`, **separado** da
+   marcação da professora (`docs/especificacao-perfil-login-progresso.md`, D4);
+3. na grade da professora, o que veio do jogo aparece como 🎮 ao lado do botão. O ✔ e o
+   botão continuam sendo só dela.
+
+O que falta é do lado do Unity: o projeto-fonte, dois arquivos que já estão prontos em
+`unity/` e a build. O passo a passo para a Olívia está em `unity/LEIA-ME.md`.
+
+Para ver funcionando antes da build existir, há um jogo de mentira em
+`tests/jogo-falso/index.html` (as instruções estão no próprio arquivo).
+
+**O "Caminho B" que este README citava antes não funciona com o `.exe`:** uma página
+web não lê arquivos que um programa gravou no computador. Por isso a ligação automática
+passa pela versão WebGL.
 
 ---
 
@@ -107,6 +121,9 @@ login.html          autenticação
 js/config.js        URL do Supabase, chave pública, lista de avatares, link do jogo
 js/db.js            acesso ao banco
 js/fila.js          fila de marcações quando a internet cai
+jogar.html          jogo no navegador (versão WebGL), com js/jogar.js
+js/ponte-jogo.js    traduz "fase concluída" do jogo em progresso do aluno
+unity/              arquivos que entram no projeto Unity (ver unity/LEIA-ME.md)
 sql/schema.sql      tabelas
 sql/politicas.sql   isolamento por professor (RLS)
 docs/PENDENCIAS.md  histórico das decisões e do que falta — leia antes de mudar algo
@@ -124,7 +141,7 @@ entra aqui.
 npm test
 ```
 
-80 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
+107 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
 obrigatórias** no Git Bash do Windows, senão o shell expande o `*` antes do Node e o
 teste roda vazio.
 

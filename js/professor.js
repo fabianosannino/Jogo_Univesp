@@ -7,7 +7,15 @@ import { exigirProfessor, sair } from './auth.js';
 import { criarDb } from './db.js';
 import { criarFila, armazenamentoSeguro } from './fila.js';
 import { montarGrade } from './grade.js';
-import { renderGrade, renderListaSimples, renderSeletorAvatar, escaparHtml } from './render.js';
+import {
+  renderGrade,
+  renderListaSimples,
+  renderSeletorAvatar,
+  renderFasesDoJogo,
+  escaparHtml,
+} from './render.js';
+import { CAMINHO_JOGO_WEB, FASES_DO_JOGO } from './config.js';
+import { fasesSemAtividade } from './ponte-jogo.js';
 
 const db = criarDb(supabase);
 const armazenamento = armazenamentoSeguro(() => window.localStorage);
@@ -110,8 +118,48 @@ async function recarregarTurma() {
   el('#lista-alunos').innerHTML = renderListaSimples(estado.alunos, 'aluno');
   el('#lista-atividades').innerHTML = renderListaSimples(estado.atividades, 'atividade');
   el('#caixa-avatar').innerHTML = renderSeletorAvatar(estado.alunos.map((a) => a.avatar));
+  desenharFasesDoJogo();
   desenharGrade();
 }
+
+// A ordem e a posicao na sequencia pedagogica: o proximo numero livre.
+function proximaOrdem() {
+  return estado.atividades.length
+    ? Math.max(...estado.atividades.map((a) => a.ordem)) + 1
+    : 1;
+}
+
+// Com o jogo do navegador desligado, nada aparece: a fase so importa quando o
+// jogo pode grava-la.
+function desenharFasesDoJogo() {
+  const faltando =
+    CAMINHO_JOGO_WEB && estado.turmaSelecionada
+      ? fasesSemAtividade(FASES_DO_JOGO, estado.atividades)
+      : [];
+  el('#fases-jogo').innerHTML = renderFasesDoJogo(faltando);
+}
+
+// Inclui de uma vez, como atividades da turma, as fases do jogo que faltam.
+// O titulo e o de FASES_DO_JOGO, que e o que js/ponte-jogo.js procura.
+document.addEventListener('click', async (evento) => {
+  const botao = evento.target.closest('#incluir-fases');
+  if (!botao || !estado.turmaSelecionada) return;
+
+  botao.disabled = true;      // clique duplo nao cria a mesma fase duas vezes
+  avisar('#aviso-erro', '');
+  try {
+    let ordem = proximaOrdem();
+    for (const fase of fasesSemAtividade(FASES_DO_JOGO, estado.atividades)) {
+      await db.criarAtividade(estado.turmaSelecionada, fase.titulo, ordem);
+      ordem += 1;
+    }
+  } catch (e) {
+    erroNaTela(e);
+  }
+  // Recarrega mesmo se falhou no meio: as que entraram aparecem, e o aviso
+  // passa a listar so as que ainda faltam.
+  await recarregarTurma().catch(erroNaTela);
+});
 
 el('#form-aluno').addEventListener('submit', async (evento) => {
   evento.preventDefault();
@@ -151,11 +199,7 @@ el('#form-atividade').addEventListener('submit', async (evento) => {
   }
   const campo = el('#atividade-titulo');
   try {
-    // A ordem e a posicao na sequencia pedagogica: o proximo numero livre.
-    const proxima = estado.atividades.length
-      ? Math.max(...estado.atividades.map((a) => a.ordem)) + 1
-      : 1;
-    await db.criarAtividade(estado.turmaSelecionada, campo.value.trim(), proxima);
+    await db.criarAtividade(estado.turmaSelecionada, campo.value.trim(), proximaOrdem());
     campo.value = '';
     await recarregarTurma();
   } catch (e) {
