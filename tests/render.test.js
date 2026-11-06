@@ -356,7 +356,26 @@ test('com a versao do navegador, a tela da crianca leva o id dela ao jogo', () =
     { caminhoJogoWeb: 'jogo-web/index.html' }
   );
   assert.match(html, /class="botao-jogar" href="jogar\.html\?aluno=a1"/);
-  assert.match(html, /Baixar o jogo para Windows/, 'o .exe continua como plano B');
+  assert.match(html, /Jogar online</);
+  assert.match(html, /Baixar para jogar offline \(Windows\)/, 'o .exe continua como opcao offline');
+  assert.match(html, /não se comunicam/, 'a tela avisa que o offline nao conta aqui');
+});
+
+// Decisao de 2026-11-06: sem como gravar, a crianca joga do mesmo jeito.
+test('computador nao preparado ou banco fora do ar: joga online sem salvar', () => {
+  const opcoes = { caminhoJogoWeb: 'jogo-web/index.html' };
+  for (const estado of [{ estado: 'sem-turma' }, { estado: 'erro' }]) {
+    const html = renderAreaAluno(estado, opcoes);
+    assert.match(html, /professor/i, 'o aviso de chamar o professor continua');
+    assert.match(html, /class="botao-jogar" href="jogar\.html"/, 'sem id: nao ha para quem gravar');
+    assert.match(html, /sem salvar/);
+  }
+});
+
+test('sem a versao online, nao existe o aviso de versoes', () => {
+  const html = renderAreaAluno({ estado: 'progresso', linha: linhaDaAna() }, { caminhoJogoWeb: '' });
+  assert.ok(!html.includes('nota-versoes'));
+  assert.ok(!html.includes('offline'), 'com uma versao so, a tela fica igual a de hoje');
 });
 
 test('"Jogar" so aparece na tela de quem vai jogar, nunca na lista de bichinhos', () => {

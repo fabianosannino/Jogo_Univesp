@@ -13,9 +13,10 @@
 
      Chega-se aqui pelo botao "Jogar" da tela de progresso da crianca, com o id
      dela no endereco (jogar.html?aluno=...). js/jogar.js abre o jogo num
-     <iframe> e escuta as fases concluidas. Com CAMINHO_JOGO_WEB vazio em
-     js/config.js, a pagina so explica que o jogo no navegador ainda nao
-     existe: nenhum link do site leva ate ela nesse caso. -->
+     <iframe> e escuta as fases concluidas. Sem aluno no endereco (ou sem
+     sessao do professor), o jogo abre do mesmo jeito, sem salvar. Com
+     CAMINHO_JOGO_WEB vazio em js/config.js, a pagina so explica que o jogo
+     online ainda nao existe: nenhum link do site leva ate ela nesse caso. -->
 <body class="stars">
     <main class="tela-jogo">
         <header class="jogo-topo">
@@ -26,6 +27,10 @@
         <div id="area-jogo" class="area-jogo">
             <p class="carregando">Carregando o jogo...</p>
         </div>
+        <!-- Para o adulto: a primeira abertura em cada computador baixa o jogo
+             inteiro; depois o navegador guarda (Data Caching, unity/LEIA-ME.md). -->
+        <p class="nota-carregamento">Na primeira vez neste computador, o jogo pode levar
+            alguns minutos para abrir. Depois fica guardado e abre rápido.</p>
     </main>
     <script type="module" src="js/jogar.js"></script>
 </body>

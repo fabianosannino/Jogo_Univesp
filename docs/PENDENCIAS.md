@@ -476,6 +476,26 @@ fase concluida grava `origem: 'jogo'` para o aluno certo; repetir a fase nao gra
 novo; codigo desconhecido e ignorado; sem rede vai para a fila e reenvia ao voltar; id
 invalido no endereco mostra so "chame o professor".
 
+### Decisoes do grupo em 2026-11-06
+
+1. **O jogo registra o progresso** (origem `'jogo'`), e **a crianca ve as estrelas**.
+2. **O online e desejado, mas nao garantido**: o sistema tem de funcionar so com o `.exe`.
+   E o que acontece com `CAMINHO_JOGO_WEB` vazio.
+3. **Online e offline nao se comunicam**, e as telas dizem isso: botoes "Jogar online" e
+   "Baixar para jogar offline (Windows)", com a nota de que o offline nao aparece na
+   plataforma; na tela do professor, um bloco explica o mesmo.
+4. **Sem como gravar, joga sem salvar** (sem sessao, sem aluno, banco fora do ar).
+5. **Avisar que a primeira vez demora** e a configuracao recomendada (README e tela do
+   professor).
+6. **Tamanho do repositorio nao preocupa**: o sistema sai do ar no fim de 2026 e e para a
+   avaliacao da disciplina, sem producao aberta. A build WebGL vai no proprio repositorio.
+7. **Ligacao fase -> atividade continua pelo nome**, sem coluna nova no banco. Os riscos
+   estao cobertos: a tela do professor nao tem "renomear atividade", o botao "Incluir as
+   fases do jogo" cria os titulos exatos, e fase sem atividade aparece como aviso na area
+   de atividades (nunca falha em silencio). Regra: **o `titulo` de uma fase em
+   `FASES_DO_JOGO` nao muda depois de publicado**. Se um dia for preciso, o ID unico e uma
+   coluna `codigo_jogo` em `atividade`.
+
 ### O que depende da Olivia (ver `unity/LEIA-ME.md`)
 
 1. **Confirmar se ainda tem o projeto Unity** (spec R3). Sem ele, nada abaixo acontece e

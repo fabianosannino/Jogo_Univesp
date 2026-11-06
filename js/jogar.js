@@ -8,13 +8,15 @@
 // aluno (spec D2). Nenhuma regra nova de acesso ao banco: a RLS de progresso ja
 // aceita origem 'jogo' para turma do professor da sessao.
 //
-// A crianca nunca ve erro tecnico (spec D7): o que der errado vai para o
-// console, e na tela fica so "chame o professor".
+// Sem como gravar -- endereco sem aluno, computador sem sessao do professor,
+// banco fora do ar -- o jogo abre do mesmo jeito, so que SEM SALVAR, e o topo
+// da tela diz isso (decisao do grupo em 2026-11-06). A crianca nunca ve erro
+// tecnico (spec D7): o motivo vai para o console.
 import { supabase } from './supabase.js';
 import { professorAtual } from './auth.js';
 import { criarDb } from './db.js';
 import { criarFila, armazenamentoSeguro } from './fila.js';
-import { criarPonte } from './ponte-jogo.js';
+import { criarPonte, acharFase } from './ponte-jogo.js';
 import { CAMINHO_JOGO_WEB, FASES_DO_JOGO, acharAvatar } from './config.js';
 import { escaparHtml } from './render.js';
 
@@ -74,50 +76,63 @@ function comemorar(fase) {
   }, 6000);
 }
 
+// Descobre para quem gravar. Devolve null quando nao da -- e entao o jogo abre
+// sem salvar. Cada motivo vai para o console, para quem for investigar.
+async function prepararGravacao(idAluno) {
+  if (!idAluno) {
+    console.info('[jogo] sem aluno no endereco: jogando sem salvar');
+    return null;
+  }
+  if (!FORMATO_UUID.test(idAluno)) {
+    console.warn('[jogo] id de aluno invalido no endereco: jogando sem salvar');
+    return null;
+  }
+  try {
+    const professor = await professorAtual();
+    if (!professor) {
+      console.warn('[jogo] nenhum professor entrou neste computador: jogando sem salvar');
+      return null;
+    }
+    const aluno = await db.buscarAluno(idAluno);
+    const atividades = await db.listarAtividades(aluno.turma_id);
+    return { aluno, atividades };
+  } catch (e) {
+    console.warn('[jogo] nao deu para preparar a gravacao, jogando sem salvar:', e.message);
+    return null;
+  }
+}
+
 async function iniciar() {
   if (!CAMINHO_JOGO_WEB) {
-    avisar('O jogo no navegador ainda não está pronto. Volte e use o botão de baixar o jogo.');
+    avisar('O jogo online ainda não está pronto. Volte e use o botão de baixar o jogo.');
     return;
   }
 
   const idAluno = new URLSearchParams(window.location.search).get('aluno') ?? '';
-  if (!FORMATO_UUID.test(idAluno)) {
-    avisar('Volte e clique no seu bichinho para jogar.');
-    return;
+  const contexto = await prepararGravacao(idAluno);
+
+  let ponte = null;
+  if (contexto) {
+    const { aluno, atividades } = contexto;
+    const emoji = acharAvatar(aluno.avatar)?.emoji ?? '\u{1F31F}';
+    quemJoga.innerHTML = `<span aria-hidden="true">${emoji}</span> ${escaparHtml(aluno.nome)}`;
+    ponte = criarPonte({ idAluno: aluno.id, atividades, fases: FASES_DO_JOGO, gravar });
+  } else {
+    quemJoga.textContent = 'Jogando sem salvar o progresso';
+    quemJoga.classList.add('sem-salvar');
   }
 
-  let aluno;
-  let atividades;
-  try {
-    const professor = await professorAtual();
-    if (!professor) {
-      avisar('Este computador ainda não foi preparado. Chame o professor.');
-      return;
-    }
-    aluno = await db.buscarAluno(idAluno);
-    atividades = await db.listarAtividades(aluno.turma_id);
-  } catch (e) {
-    console.error('[jogo] nao deu para preparar o jogo:', e);
-    avisar('Não foi possível abrir o jogo agora. Chame o professor.');
-    return;
-  }
-
-  const emoji = acharAvatar(aluno.avatar)?.emoji ?? '\u{1F31F}';
-  quemJoga.innerHTML = `<span aria-hidden="true">${emoji}</span> ${escaparHtml(aluno.nome)}`;
-
-  const ponte = criarPonte({
-    idAluno: aluno.id,
-    atividades,
-    fases: FASES_DO_JOGO,
-    gravar,
-  });
-
-  // A ponte so e publicada depois que aluno e atividades chegaram, e o jogo so
-  // e carregado depois disso: nenhuma fase pode terminar antes de haver onde
-  // grava-la.
+  // A ponte so e publicada depois de decidido se ha onde gravar, e o jogo so e
+  // carregado depois disso: nenhuma fase pode terminar antes dessa decisao.
   window.PlataformaJogo = {
     async faseConcluida(codigo) {
       try {
+        if (!ponte) {
+          // Sem salvar: a crianca e comemorada do mesmo jeito.
+          const fase = acharFase(codigo, FASES_DO_JOGO);
+          if (fase) comemorar(fase);
+          return { gravou: false, motivo: 'sem-salvar', fase };
+        }
         const r = await ponte.faseConcluida(codigo);
         if (r.fase) comemorar(r.fase);
         if (!r.gravou && r.motivo !== 'repetida') {

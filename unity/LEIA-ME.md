@@ -5,11 +5,12 @@ projeto Unity do jogo para que **o mesmo projeto gere as duas versões**:
 
 | Versão | Como a criança joga | Progresso |
 |---|---|---|
-| **Windows (.exe)** — a de hoje | baixa e abre no computador | a professora marca à mão |
-| **Navegador (WebGL)** — nova | clica em "Jogar" na plataforma | o jogo grava sozinho cada fase concluída |
+| **Windows (.exe)** — a de hoje | "Baixar para jogar offline" e abre no computador | a professora marca à mão |
+| **Navegador (WebGL)** — nova | clica em "Jogar online" na plataforma | o jogo grava sozinho cada fase concluída |
 
-As duas continuam existindo. O `.exe` vira o plano B para computadores fracos demais para
-o jogo no navegador.
+As duas continuam existindo: na plataforma, "Jogar online" e "Baixar para jogar offline".
+**Os registros das duas não se comunicam**: o que a criança faz no `.exe` não chega à
+plataforma.
 
 ## 1. Copiar os dois arquivos para o projeto
 
@@ -58,7 +59,8 @@ para o profiler e carrega o endereço da máquina onde foi compilada. Para corri
    - **Compression Format: Gzip**
    - **Decompression Fallback: marcado** (sem isso o jogo não abre no GitHub Pages)
    - **Data Caching: marcado** (o navegador guarda o jogo e não baixa de novo a cada aula)
-5. Template: pode ser o **Default** ou o **Minimal**.
+5. Template: **Default**. Ele mostra a barra de progresso enquanto o jogo carrega, o que
+   importa porque a primeira abertura em cada computador pode levar alguns minutos.
 6. Build numa pasta chamada **`jogo-web`**.
 
 Para testar no seu computador, use **Build And Run**. Abrir o `index.html` com dois
@@ -73,7 +75,7 @@ Mande a pasta `jogo-web` zipada. **Nenhum arquivo dentro dela pode passar de 100
 1. A pasta `jogo-web/` entra na raiz do repositório.
 2. Em `js/config.js`: `CAMINHO_JOGO_WEB = 'jogo-web/index.html'` e a lista de fases em
    `FASES_DO_JOGO`.
-3. A tela de cada criança ganha o botão **"Jogar"**. O jogo abre dentro da plataforma, e
+3. A tela de cada criança ganha o botão **"Jogar online"**. O jogo abre dentro da plataforma, e
    cada `Plataforma.FaseConcluida(...)` vira um registro de progresso com origem
    `'jogo'`, separado das marcações da professora.
 

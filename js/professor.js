@@ -341,6 +341,9 @@ supabase.auth.onAuthStateChange((evento) => {
 //   - Error('sem sessao'): ja redirecionou para login.html; nao mostrar nada.
 //   - qualquer outro erro (rede, token): mostrar na tela e parar aqui.
 // Sem esse envoltorio, uma rejeicao mata o modulo inteiro (pagina branca).
+// Explicacao do jogo online x offline: so faz sentido com o online ligado.
+el('#sobre-jogo-online').hidden = !CAMINHO_JOGO_WEB;
+
 let professor;
 try {
   // O id do localStorage e lido antes de recarregarTurmas para que o Ruling C28

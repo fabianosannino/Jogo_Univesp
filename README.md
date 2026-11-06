@@ -74,36 +74,45 @@ que não deu para ser aditivo. Quem for mexer, mantenha isso.
 
 ---
 
-## O jogo: duas versões, a mesma plataforma
+## O jogo: online e offline, a mesma plataforma
 
 A plataforma aceita as duas versões do jogo da Olívia, e quem escolhe é uma linha de
 `js/config.js`:
 
-| | Windows (`.exe`) — **ligada hoje** | Navegador (WebGL) — **pronta, esperando a build** |
+| | Offline: Windows (`.exe`) — **ligada hoje** | Online: navegador (WebGL) — **pronta, esperando a build** |
 |---|---|---|
-| Como a criança joga | baixa pelo botão "Baixar o jogo" | clica em **"Jogar"** na tela dela; o jogo abre dentro da plataforma |
+| Como a criança joga | "Baixar para jogar offline" | **"Jogar online"** na tela dela; abre dentro da plataforma |
 | Quem registra o progresso | a professora, na grade | o próprio jogo, a cada fase concluída |
 | Como liga | `URL_DOWNLOAD_JOGO` | `CAMINHO_JOGO_WEB` + `FASES_DO_JOGO` |
 
-Com `CAMINHO_JOGO_WEB` vazio, que é o estado de hoje, **nada muda** para quem usa. Quando
-a build WebGL existir:
+**O sistema funciona só com o offline.** Com `CAMINHO_JOGO_WEB` vazio, que é o estado de
+hoje, nada muda para quem usa. O online é desejado, mas não garantido: depende de a
+Olívia ainda ter o projeto Unity (`unity/LEIA-ME.md`).
 
-1. a tela de cada criança ganha o botão **"Jogar"** (`jogar.html`), e o download continua
-   como plano B, com o texto "Baixar o jogo para Windows";
-2. cada fase que a criança termina vira progresso com origem `'jogo'`, **separado** da
-   marcação da professora (`docs/especificacao-perfil-login-progresso.md`, D4);
-3. na grade da professora, o que veio do jogo aparece como 🎮 ao lado do botão. O ✔ e o
-   botão continuam sendo só dela.
+Decisões do grupo (2026-11-06) para quando o online existir:
 
-O que falta é do lado do Unity: o projeto-fonte, dois arquivos que já estão prontos em
-`unity/` e a build. O passo a passo para a Olívia está em `unity/LEIA-ME.md`.
+- **O jogo registra o progresso, e a criança vê as estrelas dela.** Na grade da
+  professora, o que veio do jogo aparece como 🎮 ao lado do botão; o ✔ e o botão
+  continuam sendo só dela (`docs/especificacao-perfil-login-progresso.md`, D4).
+- **Online e offline não se comunicam.** Partida jogada na versão baixada não gera
+  registro: a professora marca na grade. As telas da criança e da professora dizem isso.
+- **Sem como gravar, joga sem salvar.** Computador que ninguém preparou, banco fora do
+  ar ou endereço sem aluno: o jogo online abre do mesmo jeito, com o aviso "Jogando sem
+  salvar o progresso".
+- **A primeira vez demora.** O jogo online é baixado inteiro na primeira abertura em
+  cada computador; depois o navegador guarda. As telas avisam.
 
-Para ver funcionando antes da build existir, há um jogo de mentira em
+**Configuração recomendada**
+
+| | Online | Offline |
+|---|---|---|
+| Sistema | qualquer um com Chrome ou Edge atualizado | Windows 10 ou 11, 64 bits |
+| Memória | 4 GB ou mais | 4 GB ou mais |
+| Teste rápido | abrir `get.webgl.org/webgl2`: cubo girando = funciona | — |
+| Espaço | o navegador guarda o jogo sozinho | cerca de 200 MB para descompactar |
+
+Para ver o online funcionando antes da build existir, há um jogo de mentira em
 `tests/jogo-falso/index.html` (as instruções estão no próprio arquivo).
-
-**O "Caminho B" que este README citava antes não funciona com o `.exe`:** uma página
-web não lê arquivos que um programa gravou no computador. Por isso a ligação automática
-passa pela versão WebGL.
 
 ---
 
@@ -141,7 +150,7 @@ entra aqui.
 npm test
 ```
 
-107 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
+109 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
 obrigatórias** no Git Bash do Windows, senão o shell expande o `*` antes do Node e o
 teste roda vazio.
 

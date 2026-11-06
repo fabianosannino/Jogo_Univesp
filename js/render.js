@@ -214,14 +214,10 @@ export function renderProgressoDoAluno(linha, { caminhoJogoWeb = CAMINHO_JOGO_WE
   // para que o vao entre os dois numeros seja curto (" de ", 4 chars) e
   // o leitor de tela leia "1 de 2" de forma continua.
   //
-  // O botao "Jogar" fica aqui, e nao na tela dos bichinhos, porque e aqui que
-  // se sabe QUEM vai jogar: o endereco leva o id do aluno, e e para ele que as
-  // fases concluidas sao gravadas.
-  const jogar = caminhoJogoWeb
-    ? `<p class="jogar"><a class="botao-jogar" ` +
-      `href="jogar.html?aluno=${escaparHtml(encodeURIComponent(linha.aluno.id))}">` +
-      `<span aria-hidden="true">\u{1F3AE}</span> Jogar</a></p>`
-    : '';
+  // O botao "Jogar" que GRAVA fica aqui, e nao na tela dos bichinhos, porque e
+  // aqui que se sabe QUEM vai jogar: o endereco leva o id do aluno, e e para
+  // ele que as fases concluidas sao gravadas.
+  const jogar = caminhoJogoWeb ? botaoJogar(linha.aluno.id) : '';
 
   return (
     `<section class="progresso-aluno">` +
@@ -234,15 +230,30 @@ export function renderProgressoDoAluno(linha, { caminhoJogoWeb = CAMINHO_JOGO_WE
   );
 }
 
+// Com aluno, o jogo grava o progresso dele. Sem aluno, a crianca joga do mesmo
+// jeito, so que sem salvar: e o caso do computador que ninguem preparou ou do
+// banco fora do ar. Tirar o jogo da crianca por um problema que nao e dela
+// seria pior do que perder o registro daquela partida.
+function botaoJogar(idAluno) {
+  const destino = idAluno ? `jogar.html?aluno=${encodeURIComponent(idAluno)}` : 'jogar.html';
+  const texto = idAluno ? 'Jogar online' : 'Jogar online (sem salvar)';
+  return (
+    `<p class="jogar"><a class="botao-jogar" href="${escaparHtml(destino)}">` +
+    `<span aria-hidden="true">\u{1F3AE}</span> ${texto}</a></p>`
+  );
+}
+
 export function renderAreaAluno(estado, opcoes = {}) {
+  const { caminhoJogoWeb = CAMINHO_JOGO_WEB } = opcoes;
+  const jogarSemSalvar = caminhoJogoWeb ? botaoJogar(null) : '';
   let conteudo;
 
   if (estado.estado === 'sem-turma') {
-    conteudo = aviso('Este computador ainda nao foi preparado. Chame o professor.');
+    conteudo = aviso('Este computador ainda nao foi preparado. Chame o professor.') + jogarSemSalvar;
   } else if (estado.estado === 'carregando') {
     conteudo = `<p class="carregando">Carregando...</p>`;
   } else if (estado.estado === 'erro') {
-    conteudo = aviso('Nao foi possivel carregar agora. Chame o professor.');
+    conteudo = aviso('Nao foi possivel carregar agora. Chame o professor.') + jogarSemSalvar;
   } else if (estado.estado === 'progresso') {
     conteudo = renderProgressoDoAluno(estado.linha, opcoes);
   } else if (!estado.alunos || estado.alunos.length === 0) {
@@ -259,15 +270,20 @@ export function renderAreaAluno(estado, opcoes = {}) {
 // Sem URL configurada, devolve string vazia: a tela da crianca nunca mostra um
 // link para arquivo que nao existe. Com URL, um botao grande e escapado.
 //
-// Com a versao do navegador ligada, o download continua -- e o plano B para
-// computador fraco demais para o jogo no navegador -- e o texto diz qual
-// versao e, para nao parecer que sao dois jogos diferentes.
+// Com a versao do navegador ligada, as duas aparecem lado a lado: "online"
+// (navegador, grava) e "offline" (Windows, nao grava). Decisao do grupo em
+// 2026-11-06: os registros das duas NAO se comunicam, e a tela diz isso em
+// vez de deixar o adulto descobrir sozinho que a partida offline nao contou.
 function blocoDownload({ caminhoJogoWeb = CAMINHO_JOGO_WEB } = {}) {
   if (!URL_DOWNLOAD_JOGO) return '';
-  const texto = caminhoJogoWeb ? 'Baixar o jogo para Windows' : 'Baixar o jogo';
+  const texto = caminhoJogoWeb ? 'Baixar para jogar offline (Windows)' : 'Baixar o jogo';
+  const nota = caminhoJogoWeb
+    ? `<p class="nota-versoes">Na versão baixada, o progresso não aparece aqui: ` +
+      `as duas versões não se comunicam. A professora marca na grade.</p>`
+    : '';
   return (
     `<p class="download">` +
     `<a class="botao-baixar" href="${escaparHtml(URL_DOWNLOAD_JOGO)}">${texto}</a>` +
-    `</p>`
+    `</p>${nota}`
   );
 }
