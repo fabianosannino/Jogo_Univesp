@@ -86,6 +86,20 @@ export function criarDb(cliente) {
       );
     },
 
+    // A tela do jogo (jogar.html) recebe so o id do aluno no endereco e precisa
+    // da turma dele para achar as atividades. A RLS garante que so volta aluno
+    // de turma do professor desta sessao: id de outro professor nao e achado.
+    buscarAluno(idAluno) {
+      return pegar(
+        cliente
+          .from('aluno')
+          .select('id, nome, avatar, turma_id')
+          .eq('id', idAluno)
+          .single(),
+        null
+      );
+    },
+
     async apagarAluno(idAluno) {
       await pegar(cliente.from('aluno').delete().eq('id', idAluno), null);
     },
@@ -150,6 +164,27 @@ export function criarDb(cliente) {
             aluno_id: idAluno,
             atividade_id: idAtividade,
             origem: 'professor',
+          },
+          { onConflict: 'aluno_id,atividade_id,origem', ignoreDuplicates: true }
+        ),
+        null
+      );
+    },
+
+    // A versao do jogo que roda no navegador grava aqui, com origem 'jogo'.
+    // E um registro separado do da professora (unique inclui a origem): marcar
+    // e desmarcar na grade nunca mexem neste, e este nunca conta como se a
+    // professora tivesse observado (spec D4).
+    //
+    // Nao existe "desmarcar pelo jogo": terminar uma fase e um fato, o jogo
+    // nao tem por que desfaze-lo.
+    async marcarPeloJogo(idAluno, idAtividade) {
+      await pegar(
+        cliente.from('progresso').upsert(
+          {
+            aluno_id: idAluno,
+            atividade_id: idAtividade,
+            origem: 'jogo',
           },
           { onConflict: 'aluno_id,atividade_id,origem', ignoreDuplicates: true }
         ),

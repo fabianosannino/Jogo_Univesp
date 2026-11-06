@@ -1,195 +1,428 @@
-/* Estilo apenas dos elementos novos. style.css do Pedro nao e tocado. */
+/* Componentes da plataforma. As cores e a tipografia vem de style.css (:root). */
 
-.aviso {
-  background: #fff8e1;
-  border-left: 6px solid #f0a500;
-  color: #3a2c00;
-  padding: 16px;
-  margin: 16px 0;
-  font-size: 1.1rem;
-  border-radius: 6px;
-}
-
-/* --- painel do professor --- */
-
-/* O body.stars do style.css pinta um ::before em position:fixed cobrindo a tela
-   toda com a animacao de estrelas. O .game do Pedro escapa dela com z-index:1;
-   sem o mesmo truque aqui, o painel inteiro fica desenhado DEBAIXO da animacao
-   e a tela parece vazia, com so os tracos coloridos aparecendo.
-   O max-height com overflow existe porque o body e flex centralizado: sem ele,
-   um painel mais alto que a janela fica cortado em cima e embaixo. */
-.painel {
-  position: relative;
-  z-index: 1;
-  width: min(900px, 94vw);
-  max-height: 94vh;
-  overflow-y: auto;
-  background: #fff;
-  color: #111;
-  border-radius: 12px;
-  padding: 24px 28px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, .45);
-}
-
-.painel-topo { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.painel-topo h1 { font-size: 1.8rem; margin-right: auto; }
-#identificacao { color: #444; }
-
-.bloco { margin-top: 24px; padding-top: 16px; border-top: 2px solid #e3e3e3; }
-.bloco h2 { font-size: 1.3rem; margin-bottom: 12px; }
-
-/* O reset `*{margin:0;padding:0}` do style.css deixa campo e botao sem forma
-   nenhuma. Alvo minimo de 44px porque o professor usa isto com pressa. */
-.painel label { display: block; margin: 12px 0 4px; font-weight: 600; }
-.painel input[type="text"],
-.painel select {
-  width: min(360px, 100%);
-  min-height: 44px;
-  font-size: 1rem;
-  padding: 8px 10px;
-  border: 2px solid #777;
-  border-radius: 6px;
-  background: #fff;
-  color: #111;
-}
-.painel form button,
-.painel-topo button,
-#usar-turma {
-  min-height: 44px;
-  margin-top: 12px;
-  padding: 8px 18px;
-  font-size: 1rem;
-  border: 2px solid #10532f;
-  border-radius: 6px;
-  background: #1b7f4b;
-  color: #fff;
-  cursor: pointer;
-}
-.painel :focus-visible { outline: 3px solid #0057d9; outline-offset: 2px; }
-
-/* --- grade do professor --- */
-
-.grade { border-collapse: collapse; width: 100%; background: #fff; color: #111; }
-.grade th, .grade td { border: 1px solid #bbb; padding: 6px; text-align: center; }
-.grade th[scope="row"] { text-align: left; white-space: nowrap; }
-.grade .total { font-variant-numeric: tabular-nums; }
-
-.celula {
-  width: 44px; height: 44px;       /* alvo minimo recomendado para toque */
-  font-size: 1.3rem;
-  border: 2px solid #777;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-}
-.celula[aria-pressed="true"] { background: #1b7f4b; border-color: #10532f; color: #fff; }
-.celula:focus-visible { outline: 3px solid #0057d9; outline-offset: 2px; }
-.celula[disabled] { opacity: .5; cursor: progress; }
-
-/* --- listas de gestao --- */
-
-.lista { list-style: none; padding: 0; }
-.lista li {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 12px; padding: 8px; border-bottom: 1px solid #ddd;
-}
-.apagar { min-height: 36px; cursor: pointer; }
-
-/* --- area do aluno --- */
-
-/* Verde-escuro, nao branco: este bloco e desenhado dentro do .game do colega,
-   que tem background #32dbb1 (style.css). Branco sobre esse verde da 1,76:1 de
-   contraste e some da tela. #10361f da 7,58:1. */
-#area-aluno { color: #10361f; padding: 24px; overflow-y: auto; max-height: 100%; }
-.convite { font-size: 1.8rem; text-align: center; }
-
-.avatares { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
-.avatar-aluno {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  min-width: 120px; min-height: 120px;    /* alvo grande: mao de crianca */
-  padding: 12px;
-  font-size: 1.1rem;
-  background: #ffffff;
-  color: #111;
-  border: 3px solid #0b6b45;
-  border-radius: 16px;
-  cursor: pointer;
-}
-.avatar-aluno .emoji { font-size: 3.5rem; line-height: 1; }
-.avatar-aluno:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
-
-.progresso-aluno { background: #ffffff; color: #111; padding: 20px; border-radius: 16px; }
-.progresso-aluno h2 { font-size: 1.8rem; }
-.progresso-aluno .emoji { font-size: 2.4rem; }
-.contagem { font-size: 1.3rem; }
-
-.atividades { list-style: none; padding: 0; }
-.atividade {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px; margin-bottom: 8px;
-  font-size: 1.2rem;
-  border-radius: 10px;
-  background: #f4f4f4;            /* pendente: neutro, nunca vermelho */
-}
-.atividade.concluida { background: #e3f6e9; }
-.atividade .marca { font-size: 1.6rem; }
-
-/* Texto so para leitor de tela: a cor nao pode ser a unica informacao. */
+/* Leitor de tela: a cor nunca e a unica informacao. */
 .leitor {
   position: absolute; width: 1px; height: 1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap;
 }
 
-.voltar { min-height: 48px; min-width: 120px; font-size: 1.1rem; cursor: pointer; }
+.aviso {
+  background: var(--amarelo-claro);
+  border-left: 5px solid var(--amarelo);
+  color: #3a2c00;
+  padding: 12px 16px;
+  margin: 14px 0;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+.aviso[hidden] { display: none; }
 
-/* --- download --- */
+/* ================= porta de entrada (index.html) ================= */
 
-.download { margin-top: 24px; }
+.porta { width: min(620px, 100%); text-align: center; }
+.porta h1 { font-size: 2.2rem; margin: 6px 0 4px; }
+.porta-texto { font-size: 1.15rem; color: var(--tinta-2); }
+
+.escolhas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 26px;
+}
+.escolha {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 26px 16px 22px;
+  text-decoration: none;
+  color: var(--tinta);
+  background: #fff;
+  border: 2px solid var(--linha);
+  border-bottom-width: 5px;
+  border-radius: 18px;
+  transition: border-color .15s, transform .1s;
+}
+.escolha:hover { border-color: var(--verde); transform: translateY(-2px); }
+.escolha:active { transform: translateY(1px); }
+.escolha-icone { font-size: 3rem; line-height: 1.1; }
+.escolha strong { font-size: 1.35rem; }
+.escolha span:last-child { color: var(--tinta-2); font-size: .98rem; }
+.escolha-aluno { background: var(--verde-claro); border-color: #b9d9c4; }
+
+.porta-rodape { margin-top: 26px; font-size: .85rem; color: var(--tinta-2); }
+
+@media (max-width: 520px) {
+  .escolhas { grid-template-columns: 1fr; }
+}
+
+/* ================= login e cadastro ================= */
+
+.cartao-form h1 { font-size: 2rem; }
+.cartao-form .sub { color: var(--tinta-2); margin-top: 2px; }
+.cartao-form .btn-largo { margin-top: 24px; }
+.nota { margin-top: 18px; font-size: .92rem; color: var(--tinta-2); text-align: center; }
+.voltar-inicio {
+  display: inline-block; margin-bottom: 14px;
+  font-weight: 700; font-size: .95rem; text-decoration: none;
+}
+.voltar-inicio:hover { text-decoration: underline; }
+
+.senha-caixa { position: relative; }
+.senha-caixa input { padding-right: 88px; }
+.mostrar-senha {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  min-height: 36px; padding: 4px 10px;
+  font: inherit; font-size: .88rem; font-weight: 700;
+  color: var(--verde-escuro); background: var(--papel-2);
+  border: 0; border-radius: 8px; cursor: pointer;
+}
+
+/* ================= area do professor ================= */
+
+.painel {
+  position: relative;
+  z-index: 1;
+  width: min(1040px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--papel);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.painel-topo {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 18px 28px;
+  background: var(--verde-escuro);
+  color: #fff;
+}
+.painel-topo h1 { font-size: 1.35rem; margin-right: auto; }
+.painel-topo h1 small { display: block; font-size: .8rem; font-weight: 600; opacity: .75; letter-spacing: .04em; }
+#identificacao { font-size: .92rem; opacity: .85; }
+.painel-topo .btn-sec { min-height: 40px; padding: 6px 16px; }
+
+/* Barra da turma: sempre visivel, porque tudo abaixo depende dela. */
+.turma-barra {
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+  padding: 16px 28px;
+  background: var(--papel-2);
+  border-bottom: 1px solid var(--linha);
+}
+.turma-barra .campo { margin: 0; flex: 1 1 240px; max-width: 360px; }
+.turma-barra .link-aluno { margin-left: auto; align-self: center; font-weight: 700; }
+
+.painel-avisos { padding: 0 28px; }
+.painel-avisos .aviso { margin: 12px 0 0; }
+
+/* Abas */
+.abas {
+  display: flex; gap: 4px;
+  padding: 0 20px;
+  border-bottom: 2px solid var(--linha);
+  /* So rolagem horizontal (tela estreita), e sem barra visivel. overflow-x
+     sozinho liga tambem a vertical, e o sublinhado da aba ativa (2px abaixo
+     da borda) fazia aparecer uma barra de rolagem vertical no menu. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  /* .painel e flex em coluna com altura limitada: sem isto, quando o conteudo
+     da aba e longo o menu encolhe e o overflow corta o sublinhado. */
+  flex-shrink: 0;
+}
+.abas::-webkit-scrollbar { display: none; }
+.aba {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 52px;
+  padding: 0 18px;
+  font: inherit; font-weight: 800; font-size: 1rem;
+  color: var(--tinta-2);
+  background: none;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.aba:hover { color: var(--tinta); }
+.aba[aria-selected="true"] { color: var(--verde-escuro); border-bottom-color: var(--verde); }
+.aba .contador {
+  min-width: 24px; padding: 1px 7px;
+  font-size: .8rem; text-align: center;
+  background: var(--papel-2); color: var(--tinta-2);
+  border-radius: 999px;
+}
+.aba[aria-selected="true"] .contador { background: var(--verde-claro); color: var(--verde-escuro); }
+
+.painel-corpo { padding: 22px 28px 30px; overflow-y: auto; }
+.painel-corpo [role="tabpanel"][hidden] { display: none; }
+.painel-corpo h2 { font-size: 1.25rem; margin-bottom: 4px; }
+.ajuda { font-size: .95rem; color: var(--tinta-2); margin-bottom: 14px; }
+
+/* Formulario em linha: rotulo em cima, campo e botao lado a lado. */
+.linha-form {
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+  padding: 16px;
+  margin-bottom: 18px;
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+}
+.linha-form .campo { margin: 0; flex: 1 1 220px; }
+.linha-form .campo-curto { flex: 0 1 220px; }
+
+.caixa-jogo {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 14px 16px; margin-bottom: 18px;
+  background: var(--verde-claro);
+  border-radius: var(--raio);
+}
+.caixa-jogo p { flex: 1 1 280px; font-size: .95rem; }
+
+/* Listas de turmas, alunos e atividades */
+.lista {
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+.lista li {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--linha);
+  font-size: 1.02rem;
+}
+.lista li:last-child { border-bottom: 0; }
+.lista li:hover { background: var(--papel); }
+.apagar {
+  min-height: 36px; padding: 4px 12px;
+  font: inherit; font-size: .9rem; font-weight: 700;
+  color: var(--terra);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.apagar:hover { border-color: #e2c3b6; background: #fbefe9; }
+
+/* Grade de progresso */
+#area-grade { overflow: auto; max-width: 100%; }
+.grade {
+  border-collapse: separate; border-spacing: 0;
+  min-width: 100%;
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  font-size: .98rem;
+}
+.grade th, .grade td { padding: 8px 10px; text-align: center; border-bottom: 1px solid var(--linha); }
+.grade tbody tr:last-child > * { border-bottom: 0; }
+.grade thead th {
+  position: sticky; top: 0;
+  background: var(--papel-2);
+  font-size: .9rem; font-weight: 800;
+  vertical-align: bottom;
+  max-width: 140px;
+}
+.grade th[scope="row"] {
+  position: sticky; left: 0;
+  text-align: left; white-space: nowrap;
+  background: #fff;
+  font-weight: 700;
+}
+.grade tbody tr:hover > * { background: var(--papel); }
+.grade .total { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--verde-escuro); }
+
+.celula {
+  width: 46px; height: 46px;          /* alvo minimo de toque */
+  font-size: 1.15rem;
+  background: #fff;
+  border: 2px solid var(--linha);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .1s, border-color .1s;
+}
+.celula:hover { border-color: var(--verde); }
+.celula[aria-pressed="true"] { background: var(--verde); border-color: var(--verde-escuro); color: #fff; }
+.celula[disabled] { opacity: .5; cursor: progress; }
+
+.legenda { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; font-size: .9rem; color: var(--tinta-2); }
+
+@media (max-width: 640px) {
+  .painel-topo, .turma-barra, .painel-corpo { padding-left: 16px; padding-right: 16px; }
+  .turma-barra .link-aluno { margin-left: 0; }
+}
+
+/* ================= tela do aluno (principal.html) ================= */
+
+.tela-aluno {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 100%);
+  height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: var(--papel);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.aluno-topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 24px;
+  background: var(--verde-escuro);
+  color: #fff;
+}
+.aluno-topo h1 { font-size: 1.6rem; }
+.aluno-topo a { color: #fff; font-weight: 700; font-size: .95rem; opacity: .85; }
+.aluno-topo a:hover { opacity: 1; }
+
+#raiz-aluno { flex: 1; min-height: 0; }
+
+#area-aluno {
+  height: 100%;
+  overflow-y: auto;
+  padding: 28px 24px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.aluno-icone { font-size: 5rem; line-height: 1; text-align: center; margin-top: auto; }
+.aluno-texto { font-size: 1.6rem; font-weight: 800; text-align: center; margin: 14px 0 0; }
+
+/* Escolha da turma e do nome: botoes grandes, para clicar sem ler muito. */
+.aluno-pergunta { font-size: 1.8rem; text-align: center; margin: 8px 0 20px; }
+.aluno-turma { font-size: 1.1rem; font-weight: 700; color: var(--tinta-2); text-align: center; margin: 0; }
+.grade-escolha {
+  list-style: none; padding: 0; margin: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+}
+.escolha-item {
+  width: 100%; min-height: 120px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  padding: 16px 10px;
+  font: inherit; color: var(--tinta);
+  background: #fff;
+  border: 2px solid var(--linha);
+  border-bottom-width: 5px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: border-color .15s, transform .1s;
+}
+.escolha-item:hover { border-color: var(--verde); transform: translateY(-2px); }
+.escolha-item:active { transform: translateY(1px); }
+.escolha-item:focus-visible { outline: 5px solid var(--verde); outline-offset: 3px; }
+.escolha-item-icone { font-size: 3rem; line-height: 1.1; }
+.escolha-item strong { font-size: 1.3rem; overflow-wrap: anywhere; }
+.aluno-voltar {
+  margin-top: 22px;
+  font: inherit; font-weight: 700; font-size: 1rem;
+  color: var(--tinta-2);
+  background: none; border: none; cursor: pointer; text-decoration: underline;
+}
+.aluno-voltar:hover { color: var(--tinta); }
+
+/* O download e o unico acesso ao jogo: botao grande e amarelo. */
+.download { margin-bottom: auto; padding-top: 24px; text-align: center; }
 .botao-baixar {
-  display: inline-block; padding: 14px 24px;
-  font-size: 1.2rem; font-weight: 600;
-  background: #0b6b45; color: #fff;
-  border-radius: 10px; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 60px; padding: 12px 30px;
+  font-size: 1.3rem; font-weight: 800;
+  color: var(--tinta);
+  background: var(--amarelo);
+  border-bottom: 5px solid #c98d17;
+  border-radius: 16px;
+  text-decoration: none;
 }
-.botao-baixar:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+.botao-baixar:hover { background: #ffc85a; }
+.botao-baixar:focus-visible { outline: 5px solid var(--verde); outline-offset: 3px; }
+.botao-entrar { display: inline-block; margin-top: 4px; }
 
-/* --- link para a tela do aluno --- */
-
-/* Cor escura sobre fundo claro: contraste seguro em qualquer tema do style.css. */
-.link-aluno {
-  display: inline-block; margin-top: 12px;
-  font-size: 1.1rem; font-weight: 600;
-  color: #0b6b45; text-decoration: underline;
-}
-.link-aluno:focus-visible { outline: 3px solid #0057d9; outline-offset: 2px; }
-
-/* O .game do Pedro tem height:100vh e overflow:hidden, e nao e tocado.
-   Damos altura explicita ao container novo para que o max-height:100% do
-   #area-aluno resolva e ele possa rolar por conta propria. Sem isto, uma
-   turma de 20 alunos fica cortada e sem barra de rolagem. */
-#raiz-aluno {
-  height: calc(100vh - 140px);   /* desconta o <h1> do Pedro */
-  box-sizing: border-box;
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
 }
 
-/* --- porta de entrada (index.html) --- */
+/* O seletor de bichinho vem dentro de um <span> (js/render.js): como bloco ele
+   alinha com o campo de nome ao lado. */
+#caixa-avatar { display: block; }
 
-/* O .stars::before do style.css e position:fixed e cobre a tela inteira com a
-   animacao. Sem z-index proprio, a porta fica desenhada DEBAIXO dela e o
-   visitante ve so a animacao -- foi exatamente o que aconteceu com o painel
-   do professor antes do mesmo conserto. */
-.porta { position: relative; z-index: 1; text-align: center; }
+/* Itens flex do <body> crescem ate a largura do conteudo (min-width: auto).
+   Sem isto, a grade larga empurra o painel para fora da tela no celular, em
+   vez de rolar dentro de #area-grade. */
+.painel, .tela-aluno, .cartao { min-width: 0; }
 
-.porta-texto { font-size: 1.15rem; margin: 8px 0 4px; }
+/* Celula da grade cresce em vez de cortar o conteudo. */
+.celula { width: auto; min-width: 46px; padding: 0 6px; white-space: nowrap; }
 
-/* O .login do Pedro foi escrito para <button>, nao para <a>: como link ele
-   perde a centralizacao do texto e a altura. display:flex devolve as duas,
-   sem alterar a regra dele. */
-.porta-botao {
-  display: flex; align-items: center; justify-content: center;
-  margin: 18px auto; text-decoration: none; text-align: center;
-  padding: 0 16px; box-sizing: border-box;
+.atalhos { display: flex; gap: 12px; flex-wrap: wrap; margin: 4px 0 12px; }
+
+/* ================= estrelas da crianca e jogo online/offline ================= */
+
+/* Decisao do grupo em 2026-11-06: a crianca ve as proprias estrelas. Pendente
+   fica neutra, nunca vermelha (spec D7). */
+.progresso-aluno { width: min(560px, 100%); margin-top: 18px; }
+.contagem { font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 10px; }
+.atividades { list-style: none; padding: 0; margin: 0; }
+.atividade {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; margin-bottom: 8px;
+  font-size: 1.15rem;
+  background: #fff;
+  border: 2px solid var(--linha);
+  border-radius: var(--raio);
 }
-.porta-botao:focus-visible { outline: 4px solid #ffd400; outline-offset: 3px; }
+.atividade.concluida { background: var(--verde-claro); border-color: #b9d9c4; }
+.atividade .marca { font-size: 1.5rem; line-height: 1; }
 
-.porta-rodape { font-size: .9rem; opacity: .85; margin-top: 8px; }
+/* "Jogar online": a acao principal quando existe. Verde, porque o amarelo ja
+   e do download. */
+.jogar { margin-top: 18px; text-align: center; }
+.botao-jogar {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 64px; padding: 12px 34px;
+  font-size: 1.45rem; font-weight: 800;
+  color: #fff; background: var(--verde);
+  border-bottom: 5px solid var(--verde-escuro);
+  border-radius: 16px; text-decoration: none;
+}
+.botao-jogar:hover { background: var(--verde-escuro); }
+.botao-jogar:focus-visible { outline: 5px solid var(--amarelo); outline-offset: 3px; }
+
+/* Online x offline nao se comunicam, e a tela diz isso. Texto pequeno e
+   neutro: e para o adulto, e nunca soa como bronca para a crianca. */
+.nota-versoes {
+  margin: 10px auto 0; max-width: 34em;
+  font-size: .92rem; color: var(--tinta-2); text-align: center;
+}
+
+/* Grade do professor: o que veio do jogo fica AO LADO do botao, nunca dentro,
+   para ficar claro que o botao e so a marcacao da professora. */
+.selo-jogo { margin-left: 4px; font-size: 1.1rem; vertical-align: middle; cursor: help; }
+.lista-fases { margin: 0 0 12px 22px; }
+#incluir-fases { margin-bottom: 14px; }
+
+.sobre-jogo { margin-top: 22px; padding: 14px 18px; background: var(--papel-2); border-radius: var(--raio); }
+.sobre-jogo h3 { font-size: 1.05rem; margin-bottom: 8px; }
+.sobre-jogo ul { margin-left: 20px; }
+.sobre-jogo li { margin-bottom: 6px; font-size: .95rem; line-height: 1.45; }
+
+/* jogar.html: mesma moldura da tela do aluno (.tela-aluno + .aluno-topo). */
+.tela-jogo .aluno-topo { flex-wrap: wrap; justify-content: flex-start; }
+.aluno-topo .voltar-jogo {
+  display: inline-flex; align-items: center;
+  min-height: 44px; padding: 0 16px;              /* alvo grande: mao de crianca */
+  font-size: 1.05rem; color: var(--verde-escuro); opacity: 1;
+  background: #fff; border-radius: 12px; text-decoration: none;
+}
+.aluno-topo .voltar-jogo:focus-visible { outline: 5px solid var(--amarelo); outline-offset: 3px; }
+.quem-joga { font-size: 1.3rem; font-weight: 800; margin-right: auto; }
+.quem-joga span { font-size: 1.7rem; vertical-align: middle; }
+.quem-joga.sem-salvar { font-size: 1.05rem; color: var(--amarelo); }
+.comemoracao { font-size: 1.15rem; font-weight: 800; color: var(--amarelo); }
+
+.area-jogo { flex: 1; min-height: 0; background: #000; }
+.area-jogo .aviso { margin: 24px; }
+.area-jogo .carregando { margin: 24px; color: #fff; font-size: 1.2rem; }
+.quadro-jogo { display: block; width: 100%; height: 100%; border: 0; }
+.nota-carregamento { padding: 6px 20px; font-size: .88rem; color: var(--tinta-2); background: var(--papel-2); }

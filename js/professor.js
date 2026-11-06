@@ -7,7 +7,15 @@ import { exigirProfessor, sair } from './auth.js';
 import { criarDb } from './db.js';
 import { criarFila, armazenamentoSeguro } from './fila.js';
 import { montarGrade } from './grade.js';
-import { renderGrade, renderListaSimples, renderSeletorAvatar, escaparHtml } from './render.js';
+import {
+  renderGrade,
+  renderListaSimples,
+  renderSeletorAvatar,
+  renderFasesDoJogo,
+  escaparHtml,
+} from './render.js';
+import { CAMINHO_JOGO_WEB, FASES_DO_JOGO } from './config.js';
+import { fasesSemAtividade } from './ponte-jogo.js';
 
 const db = criarDb(supabase);
 const armazenamento = armazenamentoSeguro(() => window.localStorage);
@@ -24,7 +32,7 @@ function avisar(seletor, texto) {
 // Erro vai para a propria caixa: #aviso-fila e so da pendencia de fila, e
 // uma caixa nunca apaga a mensagem da outra.
 function erroNaTela(e) {
-  avisar('#aviso-erro', `Nao deu certo: ${e.message}`);
+  avisar('#aviso-erro', `Não deu certo: ${e.message}`);
 }
 
 const estado = {
@@ -42,6 +50,8 @@ const estado = {
 async function recarregarTurmas() {
   estado.turmas = await db.listarTurmas(professor.id);
   el('#lista-turmas').innerHTML = renderListaSimples(estado.turmas, 'turma');
+  // Professor sem nenhuma turma: o primeiro passo e criar uma.
+  if (estado.turmas.length === 0) window.abrirAba?.('turmas');
 
   // Ruling C27: escaparHtml em value e no texto do option; o replace inline nao
   // trata aspas duplas, que quebrariam o atributo value="..." (spec C27).
@@ -79,17 +89,14 @@ el('#form-turma').addEventListener('submit', async (evento) => {
   }
 });
 
+// A turma escolhida fica lembrada neste navegador: ao voltar, a professora cai
+// direto nela. (Antes havia o botao "Usar neste computador", que dizia qual
+// turma a tela do aluno mostrava; a tela do aluno agora e so o download do
+// jogo, entao o botao saiu.)
 el('#turma-select').addEventListener('change', async (evento) => {
   estado.turmaSelecionada = evento.target.value;
-  await recarregarTurma();
-});
-
-// Marca, nesta maquina, qual turma a tela do aluno deve mostrar.
-el('#usar-turma').addEventListener('click', () => {
-  if (!estado.turmaSelecionada) return;
   armazenamento.setItem('turma_ativa', estado.turmaSelecionada);
-  const turma = estado.turmas.find((t) => t.id === estado.turmaSelecionada);
-  avisar('#turma-ativa', `Este computador vai mostrar a turma "${turma.nome}" para os alunos.`);
+  await recarregarTurma();
 });
 
 // --- alunos e atividades ---
@@ -110,8 +117,48 @@ async function recarregarTurma() {
   el('#lista-alunos').innerHTML = renderListaSimples(estado.alunos, 'aluno');
   el('#lista-atividades').innerHTML = renderListaSimples(estado.atividades, 'atividade');
   el('#caixa-avatar').innerHTML = renderSeletorAvatar(estado.alunos.map((a) => a.avatar));
+  desenharFasesDoJogo();
   desenharGrade();
 }
+
+// A ordem e a posicao na sequencia pedagogica: o proximo numero livre.
+function proximaOrdem() {
+  return estado.atividades.length
+    ? Math.max(...estado.atividades.map((a) => a.ordem)) + 1
+    : 1;
+}
+
+// Com o jogo online desligado, nada aparece: a fase so importa quando o jogo
+// pode grava-la.
+function desenharFasesDoJogo() {
+  const faltando =
+    CAMINHO_JOGO_WEB && estado.turmaSelecionada
+      ? fasesSemAtividade(FASES_DO_JOGO, estado.atividades)
+      : [];
+  el('#fases-jogo').innerHTML = renderFasesDoJogo(faltando);
+}
+
+// Inclui de uma vez, como atividades da turma, as fases do jogo que faltam.
+// O titulo e o de FASES_DO_JOGO, que e o que js/ponte-jogo.js procura.
+document.addEventListener('click', async (evento) => {
+  const botao = evento.target.closest('#incluir-fases');
+  if (!botao || !estado.turmaSelecionada) return;
+
+  botao.disabled = true;      // clique duplo nao cria a mesma fase duas vezes
+  avisar('#aviso-erro', '');
+  try {
+    let ordem = proximaOrdem();
+    for (const fase of fasesSemAtividade(FASES_DO_JOGO, estado.atividades)) {
+      await db.criarAtividade(estado.turmaSelecionada, fase.titulo, ordem);
+      ordem += 1;
+    }
+  } catch (e) {
+    erroNaTela(e);
+  }
+  // Recarrega mesmo se falhou no meio: as que entraram aparecem, e o aviso
+  // passa a listar so as que ainda faltam.
+  await recarregarTurma().catch(erroNaTela);
+});
 
 el('#form-aluno').addEventListener('submit', async (evento) => {
   evento.preventDefault();
@@ -151,11 +198,7 @@ el('#form-atividade').addEventListener('submit', async (evento) => {
   }
   const campo = el('#atividade-titulo');
   try {
-    // A ordem e a posicao na sequencia pedagogica: o proximo numero livre.
-    const proxima = estado.atividades.length
-      ? Math.max(...estado.atividades.map((a) => a.ordem)) + 1
-      : 1;
-    await db.criarAtividade(estado.turmaSelecionada, campo.value.trim(), proxima);
+    await db.criarAtividade(estado.turmaSelecionada, campo.value.trim(), proximaOrdem());
     campo.value = '';
     await recarregarTurma();
   } catch (e) {
@@ -171,9 +214,9 @@ document.addEventListener('click', async (evento) => {
 
   const { tipo, id } = botao.dataset;
   const confirmacoes = {
-    turma: 'Apagar a turma apaga tambem os alunos, as atividades e todo o progresso dela. Confirma?',
+    turma: 'Apagar a turma apaga também os alunos, as atividades e todo o progresso dela. Confirma?',
     aluno: 'Apagar o aluno apaga todo o progresso dele. Confirma?',
-    atividade: 'Apagar a atividade apaga as marcacoes dela. Confirma?',
+    atividade: 'Apagar a atividade apaga as marcações dela. Confirma?',
   };
   if (!window.confirm(confirmacoes[tipo])) return;
 
@@ -210,7 +253,7 @@ function mostrarPendencias() {
   avisar(
     '#aviso-fila',
     quantas > 0
-      ? `${quantas} marcacao(oes) aguardando a internet. Nao feche esta pagina.`
+      ? `${quantas} marcação(ões) aguardando a internet. Não feche esta página.`
       : ''
   );
 }
@@ -297,6 +340,9 @@ supabase.auth.onAuthStateChange((evento) => {
 //   - Error('sem sessao'): ja redirecionou para login.html; nao mostrar nada.
 //   - qualquer outro erro (rede, token): mostrar na tela e parar aqui.
 // Sem esse envoltorio, uma rejeicao mata o modulo inteiro (pagina branca).
+// Explicacao do jogo online x offline: so faz sentido com o online ligado.
+el('#sobre-jogo-online').hidden = !CAMINHO_JOGO_WEB;
+
 let professor;
 try {
   // O id do localStorage e lido antes de recarregarTurmas para que o Ruling C28

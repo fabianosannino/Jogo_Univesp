@@ -192,7 +192,7 @@ mesmo commit. Apagar e decisao de quem coordena.
 git checkout main && git merge --ff-only perfil-login-progresso && git push origin main
 ```
 
-## 6. Debito conhecido — tres resolvidos em 2026-10-31, dois dependem do Pedro
+## 6. Debito conhecido — tres resolvidos em 2026-10-31, os dois do Pedro em 2026-11-06
 
 ### ~~O campo de avatar voltava para um bichinho em uso~~ — RESOLVIDO
 
@@ -244,7 +244,7 @@ falha em silencio — ela simplesmente para de filtrar e nada avisa.
 Sem o id, a funcao **recusa** em vez de consultar. Esse e o ponto: uma consulta sem filtro
 nao daria erro na tela, daria uma lista com a turma de outro professor dentro.
 
-### Residuo de maquete no `principal.html` — depende do Pedro
+### ~~Residuo de maquete no `principal.html`~~ — RESOLVIDO pelo PR #1 (tela do aluno nova)
 
 `principal.html` e a tela que a crianca usa, e tem duas sobras de maquete:
 
@@ -260,7 +260,7 @@ nao daria erro na tela, daria uma lista com a turma de outro professor dentro.
 A regra do time e que arquivo de colega so recebe mudanca aditiva. Trocar esse texto
 precisa do Pedro, ou do aval dele.
 
-### `perfil.html` orfao — recomendo apagar, com o aval do Pedro
+### ~~`perfil.html` orfao~~ — APAGADO pelo PR #1, junto com `script.js` e as duas imagens
 
 **Nada no site aponta para `perfil.html`** (verificado por busca em todo o HTML, JS e CSS).
 Ele mostra os textos literais "Nome", "Email" e "Progresso", e tem um campo de **escolher
@@ -451,3 +451,91 @@ Sair dele e o plano pago do Supabase, US$ 25/mes por organizacao — e o primeir
 que o projeto teria, e aparece por **confiabilidade**, nao por volume: os 500 MB
 aguentariam muitas escolas. O GitHub Pages seguiria gratuito. Essa conversa e com a
 coordenacao da escola, nao com a equipe.
+
+## 11. Jogo no navegador (WebGL) -- lado da plataforma PRONTO em 2026-11-06, falta a build
+
+A plataforma passou a aceitar as duas versoes do jogo ao mesmo tempo:
+
+- **Windows (.exe)**: a de hoje, sem nenhuma mudanca. Download pelo botao, progresso
+  marcado pela professora.
+- **Navegador (WebGL)**: `jogar.html` abre a build dentro da plataforma, e cada fase
+  concluida vira progresso com origem `'jogo'` (`js/jogar.js`, `js/ponte-jogo.js`).
+
+Quem liga a segunda e `CAMINHO_JOGO_WEB` em `js/config.js`. **Vazia, que e o estado de
+hoje, a plataforma se comporta exatamente como antes.**
+
+Nenhuma regra nova no banco: a politica de `progresso` em `sql/politicas.sql` ja aceita
+origem `'jogo'` para turma do professor da sessao, e o jogo roda na sessao que ja esta
+aberta naquela maquina (spec D2). Sem internet, a fase fica numa fila propria
+(`fila_jogo`, separada da `fila_progresso` da professora) e e reenviada quando a conexao
+volta.
+
+Verificado em 2026-11-06 no navegador, com a conta `prof1` e o jogo de mentira
+(`tests/jogo-falso/index.html`), com as escritas interceptadas antes de chegar ao banco:
+fase concluida grava `origem: 'jogo'` para o aluno certo; repetir a fase nao grava de
+novo; codigo desconhecido e ignorado; sem rede vai para a fila e reenvia ao voltar; id
+invalido no endereco mostra so "chame o professor".
+
+### Decisoes do grupo em 2026-11-06
+
+1. **O jogo registra o progresso** (origem `'jogo'`), e **a crianca ve as estrelas**.
+2. **O online e desejado, mas nao garantido**: o sistema tem de funcionar so com o `.exe`.
+   E o que acontece com `CAMINHO_JOGO_WEB` vazio.
+3. **Online e offline nao se comunicam**, e as telas dizem isso: botoes "Jogar online" e
+   "Baixar para jogar offline (Windows)", com a nota de que o offline nao aparece na
+   plataforma; na tela do professor, um bloco explica o mesmo.
+4. **Sem como gravar, joga sem salvar** (sem sessao, sem aluno, banco fora do ar).
+5. **Avisar que a primeira vez demora** e a configuracao recomendada (README e tela do
+   professor).
+6. **Tamanho do repositorio nao preocupa**: o sistema sai do ar no fim de 2026 e e para a
+   avaliacao da disciplina, sem producao aberta. A build WebGL vai no proprio repositorio.
+7. **Ligacao fase -> atividade continua pelo nome**, sem coluna nova no banco. Os riscos
+   estao cobertos: a tela do professor nao tem "renomear atividade", o botao "Incluir as
+   fases do jogo" cria os titulos exatos, e fase sem atividade aparece como aviso na area
+   de atividades (nunca falha em silencio). Regra: **o `titulo` de uma fase em
+   `FASES_DO_JOGO` nao muda depois de publicado**. Se um dia for preciso, o ID unico e uma
+   coluna `codigo_jogo` em `atividade`.
+
+### O que depende da Olivia (ver `unity/LEIA-ME.md`)
+
+1. **Confirmar se ainda tem o projeto Unity** (spec R3). Sem ele, nada abaixo acontece e
+   o jogo fica como esta.
+2. Colocar `unity/Plataforma.jslib` e `unity/Plataforma.cs` no projeto e chamar
+   `Plataforma.FaseConcluida("codigo")` no fim de cada fase.
+3. Mandar a lista de fases (codigo + nome). Ela entra em `FASES_DO_JOGO`.
+4. Gerar a build WebGL (Gzip + Decompression Fallback) e uma build Windows **sem**
+   "Development Build" (item 4).
+
+Depois disso, do lado daqui: copiar a pasta `jogo-web/` para a raiz, preencher as duas
+constantes e, em cada turma, clicar "Incluir as fases do jogo" na aba "Cadastrar
+atividades".
+
+### Mesclado com o PR #1 (tela do aluno nova, abas do professor) em 2026-11-06
+
+O PR #1 entrou neste ramo por merge, sem reescrever o commit do autor. Duas partes
+dele foram ajustadas, pelas decisoes 1 e 2 acima:
+
+- `apenasManual` (`js/grade.js`) escondia da grade tudo que tinha origem `'jogo'`.
+  Saiu: o que o jogo grava aparece como selo, separado do botao da professora.
+- a tela do aluno nao mostrava progresso. Agora o ultimo passo (turma -> nome ->
+  "Oi, Ana!") mostra as estrelas da crianca, o "Jogar online" quando existir, e o
+  download. Junto, a crianca deixou de ver mensagem tecnica de erro (spec D7): o
+  motivo vai para o console.
+
+**Aval do Pedro em 2026-11-06** para as mudancas do PR #1 nos arquivos dele
+(`perfil.html`, `script.js`, `avatar.jpg` e `Forest-Background.jpg` apagados; `style.css`,
+`principal.html`, `login.html` e `cadastro.html` reescritos), com a condicao de manter
+backup. O backup esta em `backup/layout-pedro-2026-11-06.zip` (os arquivos exatos do
+commit `c7c47c6`), com instrucoes em `backup/LEIA-ME.md`.
+
+### Defeito corrigido junto: marca do jogo presa na grade
+
+Uma celula que tinha so registro com origem `'jogo'` aparecia como marcada (botao
+apertado). O clique mandava "desmarcar", que so apaga a origem `'professor'`, e a marca
+ficava presa sem a professora conseguir tira-la. Agora o botao mostra so a marcacao da
+professora, e o registro do jogo aparece como um selo ao lado.
+
+Isso nao era teorico: a conta de demonstracao `prof1` tem um registro `'jogo'` gravado em
+2026-11-03 (Ana, "Contar ate 10"), ao que tudo indica deixado por uma recriacao do jogo em JavaScript que
+existiu e foi retirada. Com esta mudanca ele aparece como selo do jogo. Se a equipe
+preferir uma demonstracao sem ele, e um `delete` naquela linha no painel do Supabase.

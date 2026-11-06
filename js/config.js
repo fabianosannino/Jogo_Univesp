@@ -20,6 +20,36 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 export const URL_DOWNLOAD_JOGO =
   'https://github.com/fabianosannino/Jogo_Univesp/releases/download/jogo-v1.01/Jogos-Educativos-2-v1.01-windows.zip';
 
+// O jogo tem duas versoes, e as duas convivem:
+//
+//   - Windows (.exe): a de hoje. A crianca baixa pelo botao acima, joga fora do
+//     navegador, e quem marca o progresso e a professora.
+//   - Navegador (WebGL): o mesmo projeto Unity exportado para a web. Abre dentro
+//     de jogar.html, e cada fase concluida e gravada sozinha com origem 'jogo'.
+//
+// CAMINHO_JOGO_WEB liga a segunda. Vazio, a plataforma se comporta exatamente
+// como antes: nenhum botao "Jogar", nenhuma tela nova. Preenchido, a tela de
+// cada crianca ganha o botao "Jogar" e o download continua la como plano B.
+//
+// E o caminho RELATIVO ao site do index.html que a Unity gera, por exemplo
+// 'jogo-web/index.html'. Tem de morar no mesmo endereco da plataforma: o jogo
+// avisa a pagina pelo window.parent, e o navegador so permite isso entre
+// paginas do mesmo site. Por isso um endereco com http(s):// e recusado
+// (tests/config.test.js).
+export const CAMINHO_JOGO_WEB = '';
+
+// As fases que o jogo sabe avisar. `codigo` e o texto que o jogo manda
+// (Plataforma.FaseConcluida("contar-ate-10") no Unity, ver unity/LEIA-ME.md);
+// `titulo` e o nome da atividade na grade da professora.
+//
+// A ligacao fase -> atividade e pelo titulo, sem acento e sem diferenca de
+// maiusculas: "Contar até 10" encontra a atividade "Contar ate 10". A tela do
+// professor oferece um botao para incluir de uma vez as fases que ainda nao
+// existem na turma.
+//
+// Fica vazia ate a Olivia mandar a lista de fases do jogo.
+export const FASES_DO_JOGO = [];
+
 // Avatares em emoji: nenhum arquivo de imagem para carregar, funciona sem
 // rede, e cresce no tamanho que a tela precisar sem perder nitidez.
 export const AVATARES = [

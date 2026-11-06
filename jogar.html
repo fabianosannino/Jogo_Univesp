@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogar - Plataforma Educativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/plataforma.css">
+</head>
+<!-- Tela do jogo online (versao WebGL). Mesma moldura da tela do aluno
+     (.tela-aluno e .aluno-topo); estilo proprio em css/plataforma.css.
+
+     Chega-se aqui pelo botao "Jogar online" da crianca, com o id dela no
+     endereco (jogar.html?aluno=...). js/jogar.js abre o jogo num <iframe> e
+     escuta as fases concluidas. Sem aluno no endereco (ou sem sessao do
+     professor), o jogo abre do mesmo jeito, sem salvar. Com CAMINHO_JOGO_WEB
+     vazio em js/config.js, a pagina so explica que o jogo online ainda nao
+     existe: nenhum link do site leva ate ela nesse caso. -->
+<body class="stars">
+    <div class="estrelas" aria-hidden="true"><div><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <main class="tela-aluno tela-jogo">
+        <header class="aluno-topo">
+            <a class="voltar-jogo" href="principal.html">&larr; Voltar</a>
+            <p id="quem-joga" class="quem-joga"></p>
+            <p id="comemoracao" class="comemoracao" role="status" aria-live="polite"></p>
+        </header>
+        <div id="area-jogo" class="area-jogo">
+            <p class="carregando">Carregando o jogo...</p>
+        </div>
+        <!-- Para o adulto: a primeira abertura em cada computador baixa o jogo
+             inteiro; depois o navegador guarda (Data Caching, unity/LEIA-ME.md). -->
+        <p class="nota-carregamento">Na primeira vez neste computador, o jogo pode levar
+            alguns minutos para abrir. Depois fica guardado e abre rápido.</p>
+    </main>
+    <script type="module" src="js/jogar.js"></script>
+</body>
+</html>

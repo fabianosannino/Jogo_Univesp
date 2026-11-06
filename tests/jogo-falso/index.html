@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de mentira</title>
+    <style>
+        body { margin: 0; padding: 24px; font-family: sans-serif; background: #1d2b53; color: #fff; }
+        h1 { margin-top: 0; }
+        button { display: block; margin: 12px 0; min-height: 56px; padding: 0 24px;
+                 font-size: 1.2rem; border-radius: 10px; border: 0; cursor: pointer; }
+        #registro { margin-top: 16px; font-family: monospace; white-space: pre-line; }
+    </style>
+</head>
+<!-- Jogo de mentira para testar a plataforma antes da build WebGL existir.
+
+     Faz exatamente o que unity/Plataforma.jslib faz quando o C# chama
+     Plataforma.FaseConcluida("..."): procura window.parent.PlataformaJogo e
+     chama faseConcluida(codigo). Se a plataforma gravar o que este arquivo
+     manda, vai gravar o que o jogo de verdade mandar.
+
+     Para ver funcionando, so no seu computador (NAO fazer commit disto):
+       js/config.js -> CAMINHO_JOGO_WEB = 'tests/jogo-falso/index.html'
+                       FASES_DO_JOGO = [
+                         { codigo: 'contar-ate-10', titulo: 'Contar até 10' },
+                         { codigo: 'reconhecer-cores', titulo: 'Reconhecer as cores' },
+                       ]
+     O terceiro botao manda um codigo que nao existe: a plataforma tem de
+     ignorar sem quebrar. -->
+<body>
+    <h1>Jogo de mentira</h1>
+    <p>Cada botão faz o papel do fim de uma fase.</p>
+    <button type="button" data-fase="contar-ate-10">Terminar a fase "Contar até 10"</button>
+    <button type="button" data-fase="reconhecer-cores">Terminar a fase "Reconhecer as cores"</button>
+    <button type="button" data-fase="fase-que-nao-existe">Terminar uma fase desconhecida</button>
+    <div id="registro"></div>
+    <script>
+        // Copia fiel do corpo de PlataformaFaseConcluida em unity/Plataforma.jslib.
+        function plataformaFaseConcluida(codigo) {
+            try {
+                var alvo = window.parent && window.parent !== window
+                    ? window.parent.PlataformaJogo
+                    : window.PlataformaJogo;
+                if (alvo && typeof alvo.faseConcluida === 'function') {
+                    alvo.faseConcluida(codigo);
+                } else {
+                    console.log('[Plataforma] fase concluida (fora da plataforma): ' + codigo);
+                }
+            } catch (e) {
+                console.warn('[Plataforma] nao foi possivel avisar a plataforma', e);
+            }
+        }
+
+        document.addEventListener('click', function (evento) {
+            var botao = evento.target.closest('[data-fase]');
+            if (!botao) return;
+            plataformaFaseConcluida(botao.dataset.fase);
+            document.getElementById('registro').textContent += 'enviado: ' + botao.dataset.fase + '\n';
+        });
+    </script>
+</body>
+</html>

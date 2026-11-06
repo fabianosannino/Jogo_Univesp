@@ -12,9 +12,10 @@ intelectual, feita para uso real em escola parceira.
 Abra o endereço acima. A tela de entrada pergunta quem está no computador, e os dois
 caminhos existem de propósito:
 
-- **"Sou aluno"** — tela de progresso. A criança escolhe o avatar dela e vê o que já
-  conseguiu. **Ela não digita nada em momento nenhum.** Essa é a decisão central do
-  projeto, não um detalhe de interface.
+- **"Sou aluno"** — a criança escolhe a turma, depois o próprio nome, vê **as estrelas
+  dela** e clica em **"Baixar o jogo"**, que baixa direto a versão Windows. **Ela não
+  digita nada em momento nenhum.** Essa é a decisão central do projeto, não um detalhe de
+  interface.
 - **"Sou professor"** — login, e de lá o cadastro de turma, aluno, atividade e
   progresso.
 
@@ -40,23 +41,16 @@ própria e estas três são apagadas.
 
 ### Roteiro de 5 minutos
 
-1. Entre com uma das contas. Você cai numa turma montada — clique em
-   **"Usar esta turma"**.
+1. Entre com uma das contas. Você cai numa turma montada.
 2. Cadastre um aluno e escolha o avatar dele (são 30 bichos).
 3. Cadastre uma atividade.
 4. Marque a atividade como feita para um ou dois alunos.
-5. Volte à entrada, clique em **"Sou aluno"** e escolha o avatar que você criou. É isso
-   que a criança vê.
+5. Volte à entrada e clique em **"Sou aluno"**: é isso que a criança vê — turma,
+   nome, as estrelas dela e o download do jogo.
 
 Depois entre numa conta diferente: a turma da anterior **desaparece**. Não é a tela
 escondendo — é o banco recusando, por professor. Mexer no endereço do navegador não
 contorna.
-
-### Uma pegadinha de sala de aula
-
-A turma ativa fica gravada **no navegador**, separada por endereço. Em cada computador
-da escola a professora precisa entrar no site e clicar "Usar esta turma" uma vez.
-Depois aquele computador lembra.
 
 ---
 
@@ -64,7 +58,7 @@ Depois aquele computador lembra.
 
 | Pessoa | Produto | Arquivos |
 |---|---|---|
-| Pedro Henrique dos Santos Alves | Layout | `style.css`, `principal.html`, `perfil.html`, `script.js`, `login.html`, `cadastro.html` |
+| Pedro Henrique dos Santos Alves | Layout | `style.css`, `principal.html`, `login.html`, `cadastro.html` |
 | Olívia de Carvalho | Jogos (Unity) | fora deste repositório |
 | Fabiano S. | Perfis, Login e Progresso | `js/`, `css/plataforma.css`, `sql/`, `tests/`, `professor.html`, `index.html` |
 
@@ -74,22 +68,49 @@ que não deu para ser aditivo. Quem for mexer, mantenha isso.
 
 ---
 
-## O que ainda NÃO está ligado
+## O jogo: online e offline, a mesma plataforma
 
-**O jogo e a plataforma funcionam lado a lado, não juntos.** O botão "Baixar o jogo"
-entrega o jogo certo, mas quando a criança joga, **o jogo não avisa a plataforma** —
-quem marca o que foi concluído é a professora, na mão.
+A plataforma aceita as duas versões do jogo da Olívia, e quem escolhe é uma linha de
+`js/config.js`:
 
-O banco já está pronto para os dois casos: cada progresso grava uma origem,
-`'professor'` ou `'jogo'` (`sql/schema.sql`). Hoje só existe `'professor'`; o lugar do
-jogo está pronto e vazio.
+| | Offline: Windows (`.exe`) — **ligada hoje** | Online: navegador (WebGL) — **pronta, esperando a build** |
+|---|---|---|
+| Como a criança joga | "Baixar para jogar offline" | **"Jogar online"** na tela dela; abre dentro da plataforma |
+| Quem registra o progresso | a professora, na grade | o próprio jogo, a cada fase concluída |
+| Como liga | `URL_DOWNLOAD_JOGO` | `CAMINHO_JOGO_WEB` + `FASES_DO_JOGO` |
 
-Ligar isso tem dois caminhos, e **a escolha é uma decisão de equipe ainda aberta**:
+**O sistema funciona só com o offline.** Com `CAMINHO_JOGO_WEB` vazio, que é o estado de
+hoje, nada muda para quem usa. O online é desejado, mas não garantido: depende de a
+Olívia ainda ter o projeto Unity (`unity/LEIA-ME.md`).
 
-- **Caminho A** — o jogo faz uma chamada de rede ao fim de cada fase e a plataforma
-  registra sozinha. Mais completo; exige mexer no projeto Unity.
-- **Caminho B** — a plataforma só exibe o que o jogo guardar no próprio computador.
-  Mais rápido; o progresso fica preso àquela máquina.
+Decisões do grupo (2026-11-06) para quando o online existir:
+
+- **O jogo registra o progresso, e a criança vê as estrelas dela.** Na grade da
+  professora, o que veio do jogo aparece como 🎮 ao lado do botão; o ✔ e o botão
+  continuam sendo só dela (`docs/especificacao-perfil-login-progresso.md`, D4).
+- **Online e offline não se comunicam.** Partida jogada na versão baixada não gera
+  registro: a professora marca na grade. As telas da criança e da professora dizem isso.
+- **Sem como gravar, joga sem salvar.** Computador que ninguém preparou, banco fora do
+  ar ou endereço sem aluno: o jogo online abre do mesmo jeito, com o aviso "Jogando sem
+  salvar o progresso".
+- **A primeira vez demora.** O jogo online é baixado inteiro na primeira abertura em
+  cada computador; depois o navegador guarda. As telas avisam.
+
+**Configuração recomendada**
+
+| | Online | Offline |
+|---|---|---|
+| Sistema | qualquer um com Chrome ou Edge atualizado | Windows 10 ou 11, 64 bits |
+| Memória | 4 GB ou mais | 4 GB ou mais |
+| Teste rápido | abrir `get.webgl.org/webgl2`: cubo girando = funciona | — |
+| Espaço | o navegador guarda o jogo sozinho | cerca de 200 MB para descompactar |
+
+**Não existe jogo recriado em JavaScript.** Uma recriação chegou a existir (2026-11-03)
+e foi retirada por decisão do projeto. O jogo online é o mesmo projeto Unity da Olívia,
+exportado para WebGL.
+
+Para ver o online funcionando antes da build existir, há um jogo de mentira em
+`tests/jogo-falso/index.html` (as instruções estão no próprio arquivo).
 
 ---
 
@@ -107,6 +128,10 @@ login.html          autenticação
 js/config.js        URL do Supabase, chave pública, lista de avatares, link do jogo
 js/db.js            acesso ao banco
 js/fila.js          fila de marcações quando a internet cai
+jogar.html          jogo online (versão WebGL), com js/jogar.js
+js/ponte-jogo.js    traduz "fase concluída" do jogo em progresso do aluno
+unity/              arquivos que entram no projeto Unity (ver unity/LEIA-ME.md)
+backup/             layout original do Pedro, guardado em .zip (ver backup/LEIA-ME.md)
 sql/schema.sql      tabelas
 sql/politicas.sql   isolamento por professor (RLS)
 docs/PENDENCIAS.md  histórico das decisões e do que falta — leia antes de mudar algo
@@ -124,7 +149,7 @@ entra aqui.
 npm test
 ```
 
-80 testes, sem dependência externa — só o `node --test`. **As aspas no comando são
+Testes sem dependência externa — só o `node --test`. **As aspas no comando são
 obrigatórias** no Git Bash do Windows, senão o shell expande o `*` antes do Node e o
 teste roda vazio.
 

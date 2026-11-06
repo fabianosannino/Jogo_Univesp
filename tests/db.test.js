@@ -108,6 +108,32 @@ test('marcar grava origem professor', async () => {
   assert.equal(upsert[2].onConflict, 'aluno_id,atividade_id,origem');
 });
 
+test('o jogo grava com origem jogo, nunca como se fosse a professora', async () => {
+  const cliente = clienteFalso({ data: null, error: null });
+  await criarDb(cliente).marcarPeloJogo('a1', 'at1');
+
+  const upsert = cliente.chamadas.find(([m]) => m === 'upsert');
+  assert.deepEqual(upsert[1], {
+    aluno_id: 'a1',
+    atividade_id: 'at1',
+    origem: 'jogo',
+  });
+  // Mesma chave do unique do banco: concluir a fase duas vezes nao vira erro
+  // 23505 e a fila do jogo esvazia.
+  assert.equal(upsert[2].onConflict, 'aluno_id,atividade_id,origem');
+  assert.equal(upsert[2].ignoreDuplicates, true);
+});
+
+test('buscarAluno traz a turma do aluno, que a tela do jogo precisa', async () => {
+  const cliente = clienteFalso({ data: { id: 'a1' }, error: null });
+  await criarDb(cliente).buscarAluno('a1');
+
+  assert.deepEqual(cliente.chamadas[0], ['from', 'aluno']);
+  assert.ok(cliente.chamadas.some(([m, c]) => m === 'select' && c.includes('turma_id')));
+  assert.ok(cliente.chamadas.some(([m, c, v]) => m === 'eq' && c === 'id' && v === 'a1'));
+  assert.ok(cliente.chamadas.some(([m]) => m === 'single'));
+});
+
 test('desmarcar apaga apenas o registro do professor', async () => {
   const cliente = clienteFalso({ data: null, error: null });
   await criarDb(cliente).desmarcar('a1', 'at1');
@@ -149,3 +175,4 @@ test('data nulo em listagem devolve lista vazia, nao nulo', async () => {
   const cliente = clienteFalso({ data: null, error: null });
   assert.deepEqual(await criarDb(cliente).listarTurmas('prof-1'), []);
 });
+
